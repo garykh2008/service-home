@@ -1,4 +1,10 @@
-/* 家時區小標籤：固定在頁面底部中央，只有跨時區時由 custom.js 建立 */
+/* 問候語後面的「當前城市」 */
+.here-city {
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+/* 家資訊小標籤：固定在頁面底部中央，只有跨時區時由 custom.js 建立 */
 #home-tz-chip {
   position: fixed;
   bottom: 0.75rem;
