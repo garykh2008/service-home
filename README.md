@@ -14,6 +14,8 @@ homepage-config/            # 掛載進容器的 /app/config，YAML 皆版控
   docker.yaml              #   docker.sock 連線，供卡片顯示容器狀態摘要
   widgets.yaml             #   頁首資訊小工具（問候 / 日期 / 天氣）
   bookmarks.yaml           #   快速連結（後台 / 程式碼 / 文件）
+  custom.js                #   時區辨識：跨時區時於頁面底部顯示家時區
+  custom.css               #   custom.js 的樣式
 sites/home.caddy            # Caddy 反向代理設定，部署到 /etc/caddy/sites/
 ```
 
