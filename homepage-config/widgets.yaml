@@ -6,11 +6,6 @@
     text_size: xl
     text: 哈囉，Gary 👋
 
-- search:
-    provider: duckduckgo
-    focus: false
-    target: _blank
-
 - datetime:
     text_size: l
     format:

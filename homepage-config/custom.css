@@ -18,14 +18,17 @@ ul.services-list > li.service > div {
 
 /* 底部資訊卡：匯率 / 世界時鐘 / 多日預報 / Hacker News（由 custom.js 建立） */
 #extra-widgets {
-  max-width: 1200px;
-  margin: 1.5rem auto 3rem;
-  padding: 0 1.25rem;
+  margin: 0.25rem 1rem 2.5rem; /* 對齊 services/bookmarks 的邊距 */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   color: rgb(226 232 240); /* slate-200 */
   font-size: 0.9rem;
+}
+@media (min-width: 640px) {
+  #extra-widgets {
+    margin: 0.25rem 2rem 3rem; /* sm:m-8 對齊 */
+  }
 }
 #extra-widgets .xw-card {
   background: rgba(15, 23, 42, 0.55); /* slate-900 / 55% */

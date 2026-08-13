@@ -13,6 +13,12 @@ color: slate
 # 狀態燈號：滑鼠移上去才顯示，畫面清爽
 statusStyle: dot
 
+# 搜尋：不放頁首 widget（太佔寬），改用 quicklaunch——在頁面上直接打字即跳出搜尋
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  provider: duckduckgo
+
 # 群組排列（順序與欄數）
 layout:
   核心服務:

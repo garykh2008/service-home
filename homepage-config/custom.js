@@ -110,7 +110,9 @@ function appendCityToGreeting(city) {
 }
 
 // ── 底部資訊卡 ────────────────────────────────────────
+// 插在 bookmarks 正後方（footer 之前），貼著內容、不會被 min-h-screen 推到頁尾留大縫。
 function ensureExtras() {
+  const anchor = document.getElementById('bookmarks') || document.getElementById('layout-groups');
   let root = document.getElementById('extra-widgets');
   if (!root) {
     root = document.createElement('div');
@@ -120,7 +122,11 @@ function ensureExtras() {
       <div class="xw-card"><div class="xw-title">世界時鐘</div><div class="xw-body" id="xw-clocks"></div></div>
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
       <div class="xw-card"><div class="xw-title">Hacker News</div><div class="xw-body xw-news" id="xw-news">…</div></div>`;
-    document.body.appendChild(root);
+  }
+  if (anchor) {
+    if (anchor.nextSibling !== root) anchor.parentNode.insertBefore(root, anchor.nextSibling);
+  } else if (!root.parentElement) {
+    document.body.appendChild(root); // 保底
   }
   return root;
 }
@@ -218,8 +224,16 @@ async function init() {
   renderForecast(coords);
   renderNews();
 
-  // 定時更新
+  // 定時更新（順便確保底部卡片還在；被 React 移除就重建並補資料）
   setInterval(() => {
+    if (!document.getElementById('extra-widgets')) {
+      ensureExtras();
+      renderExchange();
+      renderForecast(coords);
+      renderNews();
+    } else {
+      ensureExtras(); // 只是被搬走的話搬回
+    }
     renderClocks(homeWeather);
     if (currentCity) appendCityToGreeting(currentCity);
   }, 30000);
