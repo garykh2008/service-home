@@ -3,10 +3,10 @@
 //
 // ── 個人設定：改這裡就好 ─────────────────────────────
 const HOME = {
-  label: '台北', // 家的顯示名稱
+  label: '新竹', // 家的顯示名稱
   tz: 'Asia/Taipei', // 家時區
-  latitude: 25.033, // 家緯度
-  longitude: 121.5654, // 家經度
+  latitude: 24.791977, // 家緯度
+  longitude: 121.015696, // 家經度
   showWhenLocal: false, // false=只有跨時區才顯示家資訊；true=在家時也顯示
 };
 // 與 widgets.yaml 的 greeting 文字一致，用來定位並在後面補上當前城市
