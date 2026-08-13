@@ -64,18 +64,6 @@
         description: 推播通知，已開登入可跨裝置同步訂閱
         server: my-docker
         container: ntfy
-        # 即時數據模板（需 token 才會活）：把某個 topic 的最近訊息數拉進卡片。
-        # 取消註解並填 access token（ntfy 已開登入，需帶 Authorization）。
-        # widget:
-        #   type: customapi
-        #   url: https://notify.garyhsieh-proj.com/<topic>/json?poll=1&since=all
-        #   refreshInterval: 30000
-        #   method: GET
-        #   headers:
-        #     Authorization: Bearer <NTFY_ACCESS_TOKEN>
-        #   mappings:
-        #     - field: id
-        #       label: 最新訊息 id
 
     - Supabase:
         icon: supabase
@@ -84,17 +72,6 @@
         description: self-hosted（mangan-log 後端），API 閘道為 kong
         server: my-docker
         container: supabase-kong
-        # 即時數據模板（需填表名 + anon key 才會活）：顯示某張表的筆數。
-        # PostgREST 用 Content-Range 回總數，配合 Prefer: count=exact。
-        # widget:
-        #   type: customapi
-        #   url: https://supabase.garyhsieh-proj.com/rest/v1/<table>?select=id&limit=1
-        #   refreshInterval: 60000
-        #   method: GET
-        #   headers:
-        #     apikey: <SUPABASE_ANON_KEY>
-        #     Authorization: Bearer <SUPABASE_ANON_KEY>
-        #     Prefer: count=exact
         #   mappings:
         #     - field: 0.id
         #       label: 範例欄位
