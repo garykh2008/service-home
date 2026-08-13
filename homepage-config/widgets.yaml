@@ -6,6 +6,11 @@
     text_size: xl
     text: 哈囉，Gary 👋
 
+- search:
+    provider: duckduckgo
+    focus: false
+    target: _blank
+
 - datetime:
     text_size: l
     format:
@@ -20,3 +25,11 @@
 - openmeteo:
     units: metric
     cache: 5
+
+# VPS 資源一瞥（cpu/記憶體/開機時間讀自主機）。
+# 邊界：只做「一眼掃過」，深入監控仍走 VPS Dashboard。
+- resources:
+    label: VPS
+    cpu: true
+    memory: true
+    uptime: true

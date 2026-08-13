@@ -16,22 +16,51 @@ ul.services-list > li.service > div {
   font-weight: 400;
 }
 
-/* 家資訊小標籤：固定在頁面底部中央，只有跨時區時由 custom.js 建立 */
-#home-tz-chip {
-  position: fixed;
-  bottom: 0.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  padding: 0.4rem 0.9rem;
-  border-radius: 9999px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+/* 底部資訊卡：匯率 / 世界時鐘 / 多日預報 / Hacker News（由 custom.js 建立） */
+#extra-widgets {
+  max-width: 1200px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
   color: rgb(226 232 240); /* slate-200 */
-  background: rgba(15, 23, 42, 0.8); /* slate-900 / 80% */
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  pointer-events: none; /* 不擋下方點擊 */
+  font-size: 0.9rem;
+}
+#extra-widgets .xw-card {
+  background: rgba(15, 23, 42, 0.55); /* slate-900 / 55% */
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+#extra-widgets .xw-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+  margin-bottom: 0.55rem;
+}
+#extra-widgets .xw-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+}
+#extra-widgets .xw-big {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+#extra-widgets a {
+  color: inherit;
+  text-decoration: none;
+}
+#extra-widgets a:hover {
+  text-decoration: underline;
+}
+#extra-widgets .xw-news a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.15rem 0;
 }
