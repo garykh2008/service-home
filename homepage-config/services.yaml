@@ -5,9 +5,11 @@
 # 每張卡片：
 #   href        點擊前往的網址（正式網域）
 #   siteMonitor 健康檢查目標（外部 HTTP 探測），決定燈號
-#   server/container  docker.sock 容器狀態摘要（上/下線 + CPU/記憶體）
-#   showStats   顯示 CPU/記憶體用量
+#   server/container  docker.sock 容器狀態摘要（上/下線燈號；CPU/記憶體）
 #   icon        取自 https://github.com/homarr-labs/dashboard-icons
+#
+# 統計（CPU/記憶體）預設收合，保持卡片整齊；點卡片可展開。
+# 若想某張預設就展開，於該卡片加 `showStats: true`。
 #
 # container 名稱已於 2026-08-13 用 VPS `docker ps` 核對。
 # 非容器服務（VPS Dashboard 主機程序、routine 靜態檔）不掛 container。
@@ -30,7 +32,6 @@
         description: 跨裝置快速傳送門
         server: my-docker
         container: quick-portal
-        showStats: true
 
     - DevHub:
         icon: mdi-code-braces
@@ -39,7 +40,6 @@
         description: 開發工具集（僅限 localhost，經 Caddy 對外）
         server: my-docker
         container: devhub-server
-        showStats: true
 
 - 工具與資料:
     - 繪本庫:
@@ -49,7 +49,6 @@
         description: 繪本收藏庫
         server: my-docker
         container: my-library
-        showStats: true
 
     - 定期通知:
         icon: mdi-bell-ring
@@ -65,7 +64,6 @@
         description: 推播通知，已開登入可跨裝置同步訂閱
         server: my-docker
         container: ntfy
-        showStats: true
         # 即時數據模板（需 token 才會活）：把某個 topic 的最近訊息數拉進卡片。
         # 取消註解並填 access token（ntfy 已開登入，需帶 Authorization）。
         # widget:
@@ -86,7 +84,6 @@
         description: self-hosted（mangan-log 後端），API 閘道為 kong
         server: my-docker
         container: supabase-kong
-        showStats: true
         # 即時數據模板（需填表名 + anon key 才會活）：顯示某張表的筆數。
         # PostgREST 用 Content-Range 回總數，配合 Prefer: count=exact。
         # widget:
