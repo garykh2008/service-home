@@ -1,0 +1,23 @@
+---
+# 頁首資訊小工具
+# 文件：https://gethomepage.dev/configs/info-widgets/
+
+- greeting:
+    text_size: xl
+    text: 哈囉，Gary 👋
+
+- datetime:
+    text_size: l
+    format:
+      dateStyle: full
+      timeStyle: short
+      hourCycle: h23
+
+# 天氣：openmeteo 免 API key。座標預設台北，可自行改。
+- openmeteo:
+    label: 台北
+    latitude: 25.0330
+    longitude: 121.5654
+    timezone: Asia/Taipei
+    units: metric
+    cache: 5
