@@ -1,0 +1,15 @@
+# Homepage 執行時產生的檔案
+homepage-config/logs/
+homepage-config/*.log
+
+# 環境變數 / 祕密
+.env
+.env.*
+!.env.example
+
+# 作業系統
+.DS_Store
+Thumbs.db
+
+# Claude Code 本地設定
+.claude/

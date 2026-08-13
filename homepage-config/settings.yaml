@@ -1,0 +1,23 @@
+---
+# Homepage 全域設定
+# 文件：https://gethomepage.dev/configs/settings/
+
+title: Gary's Services
+description: home.garyhsieh-proj.com — 服務入口大廳
+
+# 標題列
+headerStyle: clean
+theme: dark
+color: slate
+
+# 狀態燈號：滑鼠移上去才顯示，畫面清爽
+statusStyle: dot
+
+# 群組排列（順序與欄數）
+layout:
+  核心服務:
+    style: row
+    columns: 3
+  工具與資料:
+    style: row
+    columns: 4

@@ -1,0 +1,55 @@
+---
+# 服務卡片
+# 文件：https://gethomepage.dev/configs/services/
+#
+# 每張卡片：
+#   href        點擊前往的網址（正式網域）
+#   siteMonitor 健康檢查目標，同一個網址即可，決定狀態燈號
+#   icon        取自 https://github.com/homarr-labs/dashboard-icons
+#
+# 邊界：這裡只做「連結 + 狀態燈號」的淺層入口。深度操作（重啟容器、
+# 看 log、瀏覽檔案）一律回到 VPS Dashboard 進行，不在此重做。
+
+- 核心服務:
+    - VPS Dashboard:
+        icon: mdi-view-dashboard
+        href: https://dashboard.garyhsieh-proj.com
+        siteMonitor: https://dashboard.garyhsieh-proj.com
+        description: 效能 / Docker / 檔案管理，深度操作面板
+
+    - Quick Portal:
+        icon: mdi-send
+        href: https://portal.garyhsieh-proj.com
+        siteMonitor: https://portal.garyhsieh-proj.com
+        description: 跨裝置快速傳送門
+
+    - DevHub:
+        icon: mdi-code-braces
+        href: https://devhub.garyhsieh-proj.com
+        siteMonitor: https://devhub.garyhsieh-proj.com
+        description: 開發工具集（僅限 localhost，經 Caddy 對外）
+
+- 工具與資料:
+    - 繪本庫:
+        icon: mdi-book-open-page-variant
+        href: https://library.garyhsieh-proj.com
+        siteMonitor: https://library.garyhsieh-proj.com
+        description: 繪本收藏庫
+
+    - 定期通知:
+        icon: mdi-bell-ring
+        href: https://routine.garyhsieh-proj.com
+        siteMonitor: https://routine.garyhsieh-proj.com
+        description: routine-notify（Caddy 層有 basic_auth，燈號可能顯示未授權）
+
+    - ntfy:
+        icon: mdi-message-badge
+        href: https://notify.garyhsieh-proj.com
+        siteMonitor: https://notify.garyhsieh-proj.com
+        description: 推播通知，已開登入可跨裝置同步訂閱
+
+    - Supabase:
+        icon: mdi-database
+        href: https://supabase.garyhsieh-proj.com
+        siteMonitor: https://supabase.garyhsieh-proj.com
+        description: self-hosted（mangan-log）
