@@ -1,0 +1,8 @@
+mangan-log.garyhsieh-proj.com {
+	root * /srv/mangan-log
+	encode gzip
+
+	# SPA fallback：非實體檔案的路由都回 index.html
+	try_files {path} /index.html
+	file_server
+}

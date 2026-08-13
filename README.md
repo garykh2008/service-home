@@ -62,6 +62,35 @@ docker ps --format '{{.Names}}'
 名稱對不上時 Homepage 只會不顯示狀態、不報錯。非容器服務（如 routine 靜態檔）不掛
 `container`。深度操作（重啟、看 log）仍走 VPS Dashboard。
 
+## mangan-log 部署（取代 Coolify）
+
+mangan-log（Manganle Health Tracker，React + Vite PWA，原始碼 `D:\code\mangan-log`）
+原本用 Coolify 部署在 duckdns，現改為與其他服務一致：build 成靜態檔，走 Caddy。
+
+前置一次性設定：
+
+1. 在 `D:\code\mangan-log\.env.production` 填入（此檔已被該 repo gitignore）：
+
+   ```
+   VITE_SUPABASE_URL=https://supabase.garyhsieh-proj.com
+   VITE_SUPABASE_ANON_KEY=<沿用原 Coolify env 的 anon key>
+   ```
+
+2. VPS 放好 `sites/mangan-log.caddy`，Cloudflare 加 `mangan-log.garyhsieh-proj.com`
+   A 記錄（灰雲）。
+
+之後每次更新，一行搞定（Windows Git Bash 或 Linux 皆可）：
+
+```bash
+VPS=root@你的VPS bash scripts/deploy-mangan-log.sh
+```
+
+腳本會 `npm ci && npm run build`（自動載入 `.env.production`）再把 `dist/` 送到 VPS
+`/srv/mangan-log`。確認新網域可用後，即可在 Coolify 刪掉舊 app；若 Coolify 已無其他
+負載，可整套退役。
+
+> ⚠️ `VITE_SUPABASE_URL` 是 build 期寫死的：Supabase 換網域一定要重跑此腳本重建。
+
 ## 修改設定
 
 改完 `homepage-config/*.yaml` 後，Homepage 會自動重讀，多數情況不需重啟容器；
