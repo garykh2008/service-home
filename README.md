@@ -62,34 +62,25 @@ docker ps --format '{{.Names}}'
 名稱對不上時 Homepage 只會不顯示狀態、不報錯。非容器服務（如 routine 靜態檔）不掛
 `container`。深度操作（重啟、看 log）仍走 VPS Dashboard。
 
-## mangan-log 部署（取代 Coolify）
+## mangan-log 路由（取代 Coolify）
 
-mangan-log（Manganle Health Tracker，React + Vite PWA，原始碼 `D:\code\mangan-log`）
-原本用 Coolify 部署在 duckdns，現改為與其他服務一致：build 成靜態檔，走 Caddy。
+mangan-log（Manganle Health Tracker，React + Vite PWA）原本用 Coolify 部署在 duckdns，
+現改為 build 成靜態檔走 Caddy，與其他服務一致。
 
-前置一次性設定：
-
-1. 在 `D:\code\mangan-log\.env.production` 填入（此檔已被該 repo gitignore）：
-
-   ```
-   VITE_SUPABASE_URL=https://supabase.garyhsieh-proj.com
-   VITE_SUPABASE_ANON_KEY=<沿用原 Coolify env 的 anon key>
-   ```
-
-2. VPS 放好 `sites/mangan-log.caddy`，Cloudflare 加 `mangan-log.garyhsieh-proj.com`
-   A 記錄（灰雲）。
-
-之後每次更新，一行搞定（Windows Git Bash 或 Linux 皆可）：
+**界線**：這個 repo 只負責**路由**——`sites/mangan-log.caddy` 把
+`mangan-log.garyhsieh-proj.com` 反向代理到 VPS 上的靜態檔 `/srv/mangan-log`。
+**build 與部署**跟著 app 走，在 mangan-log 自己的 repo：
 
 ```bash
-VPS=root@你的VPS bash scripts/deploy-mangan-log.sh
+# 於 mangan-log 專案目錄
+VPS=root@你的VPS npm run deploy
 ```
 
-腳本會 `npm ci && npm run build`（自動載入 `.env.production`）再把 `dist/` 送到 VPS
-`/srv/mangan-log`。確認新網域可用後，即可在 Coolify 刪掉舊 app；若 Coolify 已無其他
-負載，可整套退役。
+它會 build 出 `dist/` 並 scp 到 VPS `/srv/mangan-log`。細節見該 repo 的 `deploy.sh`。
 
-> ⚠️ `VITE_SUPABASE_URL` 是 build 期寫死的：Supabase 換網域一定要重跑此腳本重建。
+VPS 端一次性：放好 `sites/mangan-log.caddy` → `caddy validate` → `reload`；
+Cloudflare 加 `mangan-log.garyhsieh-proj.com` A 記錄（灰雲）。確認新網域可用後，
+即可在 Coolify 刪掉舊 app；若 Coolify 已無其他負載，可整套退役。
 
 ## 修改設定
 
