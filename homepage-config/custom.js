@@ -13,6 +13,8 @@ const HOME = {
 const GREETING_TEXT = '哈囉，Gary 👋';
 // 反查當前城市名（會把座標送到 BigDataCloud）。設 false 可完全關閉此功能。
 const SHOW_CURRENT_CITY = true;
+// 城市名語言：'zh'=中文（森尼韋爾）、'en'=英文（Sunnyvale）
+const CITY_LANG = 'zh';
 // ─────────────────────────────────────────────────────
 
 // WMO 天氣代碼 → emoji
@@ -55,7 +57,7 @@ async function fetchJSON(url) {
   return r.json();
 }
 
-// IP 定位（免權限視窗，與天氣一致）；主 ipwho.is，退回 geojs
+// IP 定位（免權限視窗，較粗略）；主 ipwho.is，退回 geojs
 async function ipLocate() {
   try {
     const j = await fetchJSON('https://ipwho.is/');
@@ -70,6 +72,23 @@ async function ipLocate() {
   return null;
 }
 
+// 定位：瀏覽器定位優先（精準，已授權則不跳窗），失敗退回 IP 定位
+async function locate() {
+  if (navigator.geolocation) {
+    try {
+      const c = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition((p) => res(p.coords), rej, {
+          enableHighAccuracy: false,
+          timeout: 8000,
+          maximumAge: 600000,
+        })
+      );
+      return { lat: c.latitude, lon: c.longitude };
+    } catch (e) {}
+  }
+  return ipLocate();
+}
+
 async function currentWeather(lat, lon) {
   const data = await fetchJSON(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`
@@ -82,9 +101,10 @@ async function currentWeather(lat, lon) {
 
 async function reverseCity(lat, lon) {
   const d = await fetchJSON(
-    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${CITY_LANG}`
   );
-  return d.city || d.locality || d.principalSubdivision || '';
+  // locality 較精細（如 Sunnyvale），優先於 city（如 San Jose）
+  return d.locality || d.city || d.principalSubdivision || '';
 }
 
 // 把「· 📍城市」補到問候語後面
@@ -147,10 +167,10 @@ async function init() {
     if (!document.hidden) renderHomeChip();
   });
 
-  // 當前城市名（IP 定位 → 反查中文城市名，免權限視窗）
+  // 當前城市名（瀏覽器定位優先 → 反查，取較精細的 locality）
   if (SHOW_CURRENT_CITY) {
     try {
-      const loc = await ipLocate();
+      const loc = await locate();
       if (loc) {
         currentCity = await reverseCity(loc.lat, loc.lon);
         appendCityToGreeting(currentCity);
