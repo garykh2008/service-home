@@ -55,15 +55,19 @@ async function fetchJSON(url) {
   return r.json();
 }
 
-function getPosition() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error('no geolocation'));
-    navigator.geolocation.getCurrentPosition(
-      (p) => resolve(p.coords),
-      reject,
-      { maximumAge: 600000, timeout: 8000 }
-    );
-  });
+// IP 定位（免權限視窗，與天氣一致）；主 ipwho.is，退回 geojs
+async function ipLocate() {
+  try {
+    const j = await fetchJSON('https://ipwho.is/');
+    if (j && j.success !== false && j.latitude != null)
+      return { lat: j.latitude, lon: j.longitude };
+  } catch (e) {}
+  try {
+    const j = await fetchJSON('https://get.geojs.io/v1/ip/geo.json');
+    if (j && j.latitude != null)
+      return { lat: parseFloat(j.latitude), lon: parseFloat(j.longitude) };
+  } catch (e) {}
+  return null;
 }
 
 async function currentWeather(lat, lon) {
@@ -100,6 +104,7 @@ function appendCityToGreeting(city) {
 }
 
 let homeWeatherCache = null; // { temp, emoji }
+let currentCity = null; // 反查到的當前城市名
 
 function renderHomeChip() {
   const abroad = hhmm(HOME.tz) !== hhmm(undefined);
@@ -133,18 +138,23 @@ async function init() {
   refreshHomeWeather();
   setInterval(refreshHomeWeather, 900000);
 
-  // 家時間每 15 秒更新
-  setInterval(renderHomeChip, 15000);
+  // 家時間每 15 秒更新；順便補回可能被重繪清掉的當前城市
+  setInterval(() => {
+    renderHomeChip();
+    if (currentCity) appendCityToGreeting(currentCity);
+  }, 15000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) renderHomeChip();
   });
 
-  // 當前城市名
+  // 當前城市名（IP 定位 → 反查中文城市名，免權限視窗）
   if (SHOW_CURRENT_CITY) {
     try {
-      const c = await getPosition();
-      const city = await reverseCity(c.latitude, c.longitude);
-      appendCityToGreeting(city);
+      const loc = await ipLocate();
+      if (loc) {
+        currentCity = await reverseCity(loc.lat, loc.lon);
+        appendCityToGreeting(currentCity);
+      }
     } catch (e) {}
   }
 }
