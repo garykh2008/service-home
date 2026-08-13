@@ -77,9 +77,9 @@
         showStats: true
 
     - mangan-log:
-        icon: mdi-notebook-outline
-        href: https://mangan-log.gary-coolify.duckdns.org
-        siteMonitor: https://mangan-log.gary-coolify.duckdns.org
-        description: 前端 app（Coolify 部署，搭配上面 Supabase）；仍在 duckdns 待遷移
-        # Coolify 容器名帶部署編號（-002641803003）每次部署會變，
-        # 故不掛 container，狀態以 siteMonitor 為準。UUID: odz4cqzbta0gku4q5svt6x3y
+        icon: mdi-heart-pulse
+        href: https://mangan-log.garyhsieh-proj.com
+        siteMonitor: https://mangan-log.garyhsieh-proj.com
+        description: Manganle 服藥/健康追蹤 PWA（搭配上面 Supabase）
+        # 靜態檔（/srv/mangan-log，走 Caddy），無對應容器；
+        # 由 mangan-log repo 的 `npm run deploy` build+scp 佈署，已退出 Coolify
