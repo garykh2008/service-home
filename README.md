@@ -10,7 +10,8 @@ Docker 容器操作、檔案管理）仍走 [VPS Dashboard](https://dashboard.ga
 docker-compose.yml          # Homepage 容器（綁 127.0.0.1:3050，對外走 Caddy）
 homepage-config/            # 掛載進容器的 /app/config，YAML 皆版控
   settings.yaml             #   標題、主題、群組排列
-  services.yaml             #   服務卡片（href + siteMonitor 健康檢查）
+  services.yaml             #   服務卡片（href + siteMonitor + 容器狀態）
+  docker.yaml              #   docker.sock 連線，供卡片顯示容器狀態摘要
 sites/home.caddy            # Caddy 反向代理設定，部署到 /etc/caddy/sites/
 ```
 
@@ -48,6 +49,18 @@ sites/home.caddy            # Caddy 反向代理設定，部署到 /etc/caddy/si
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
 全部驗證完畢前不要刪除。
+
+## 容器狀態摘要
+
+卡片透過唯讀掛載的 `docker.sock` 顯示容器上/下線與 CPU/記憶體，只做「一眼看有沒有
+掛掉」。`services.yaml` 裡的 `container:` 名稱為推測值，部署前先在 VPS 核對：
+
+```bash
+docker ps --format '{{.Names}}'
+```
+
+名稱對不上時 Homepage 只會不顯示狀態、不報錯。非容器服務（如 routine 靜態檔）不掛
+`container`。深度操作（重啟、看 log）仍走 VPS Dashboard。
 
 ## 修改設定
 
