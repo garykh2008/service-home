@@ -1,3 +1,15 @@
+/* 服務卡片高度統一：卡片填滿格子、一致最小高度、內容垂直置中 */
+ul.services-list > li.service {
+  display: flex;
+}
+ul.services-list > li.service > div {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 5rem;
+}
+
 /* 問候語後面的「當前城市」 */
 .here-city {
   opacity: 0.75;
