@@ -9,9 +9,8 @@
 #   showStats   顯示 CPU/記憶體用量
 #   icon        取自 https://github.com/homarr-labs/dashboard-icons
 #
-# ⚠️ container 名稱為推測值，請在 VPS 上跑 `docker ps --format '{{.Names}}'`
-#    核對後修正。名稱對不上時只是不顯示狀態，不會報錯。
-#    非容器（如 routine 靜態檔）不掛 container。
+# container 名稱已於 2026-08-13 用 VPS `docker ps` 核對。
+# 非容器服務（VPS Dashboard 主機程序、routine 靜態檔）不掛 container。
 #
 # 邊界：這裡只做「連結 + 燈號 + 掛掉沒」的淺層入口。深度操作（重啟容器、
 # 看 log、瀏覽檔案）一律回到 VPS Dashboard，不在此重做。
@@ -22,9 +21,7 @@
         href: https://dashboard.garyhsieh-proj.com
         siteMonitor: https://dashboard.garyhsieh-proj.com
         description: 效能 / Docker / 檔案管理，深度操作面板
-        server: my-docker
-        container: vps-dashboard  # ← 核對
-        showStats: true
+        # 非容器（主機程序 :3001），僅用 siteMonitor 探測
 
     - Quick Portal:
         icon: mdi-send
@@ -32,7 +29,7 @@
         siteMonitor: https://portal.garyhsieh-proj.com
         description: 跨裝置快速傳送門
         server: my-docker
-        container: quick-portal  # ← 核對
+        container: quick-portal
         showStats: true
 
     - DevHub:
@@ -41,7 +38,7 @@
         siteMonitor: https://devhub.garyhsieh-proj.com
         description: 開發工具集（僅限 localhost，經 Caddy 對外）
         server: my-docker
-        container: devhub  # ← 核對
+        container: devhub-server
         showStats: true
 
 - 工具與資料:
@@ -51,7 +48,7 @@
         siteMonitor: https://library.garyhsieh-proj.com
         description: 繪本收藏庫
         server: my-docker
-        container: library  # ← 核對
+        container: my-library
         showStats: true
 
     - 定期通知:
@@ -67,7 +64,7 @@
         siteMonitor: https://notify.garyhsieh-proj.com
         description: 推播通知，已開登入可跨裝置同步訂閱
         server: my-docker
-        container: ntfy  # ← 核對
+        container: ntfy
         showStats: true
 
     - Supabase:
@@ -76,5 +73,5 @@
         siteMonitor: https://supabase.garyhsieh-proj.com
         description: self-hosted（mangan-log），API 閘道為 kong
         server: my-docker
-        container: supabase-kong  # ← 核對（self-hosted 常為 supabase-kong）
+        container: supabase-kong
         showStats: true
