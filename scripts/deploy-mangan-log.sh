@@ -36,7 +36,11 @@ if [[ ! -f .env.production ]]; then
 fi
 
 echo "▶ 安裝相依並 build"
-npm ci
+# 優先用 npm ci（可重現）；lock 與 package.json 漂移時退回 npm install
+if ! npm ci; then
+	echo "⚠ npm ci 失敗（lock 不同步），改用 npm install（會更新 package-lock.json，記得 commit）" >&2
+	npm install
+fi
 npm run build
 
 echo "▶ 佈署 dist/ → $VPS:$REMOTE_DIR"
