@@ -71,7 +71,15 @@
         icon: mdi-database
         href: https://supabase.garyhsieh-proj.com
         siteMonitor: https://supabase.garyhsieh-proj.com
-        description: self-hosted（mangan-log），API 閘道為 kong
+        description: self-hosted（mangan-log 後端），API 閘道為 kong
         server: my-docker
         container: supabase-kong
         showStats: true
+
+    - mangan-log:
+        icon: mdi-notebook-outline
+        href: https://mangan-log.gary-coolify.duckdns.org
+        siteMonitor: https://mangan-log.gary-coolify.duckdns.org
+        description: 前端 app（Coolify 部署，搭配上面 Supabase）；仍在 duckdns 待遷移
+        # Coolify 容器名帶部署編號（-002641803003）每次部署會變，
+        # 故不掛 container，狀態以 siteMonitor 為準。UUID: odz4cqzbta0gku4q5svt6x3y
