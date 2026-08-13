@@ -13,8 +13,8 @@ const HOME = {
 const GREETING_TEXT = '哈囉，Gary 👋';
 // 反查當前城市名（會把座標送到 BigDataCloud）。設 false 可完全關閉此功能。
 const SHOW_CURRENT_CITY = true;
-// 城市名語言：'zh'=中文（森尼韋爾）、'en'=英文（Sunnyvale）
-const CITY_LANG = 'zh';
+// 城市名語言：'en'=英文（Sunnyvale）、'zh'=中文（森尼韋爾）
+const CITY_LANG = 'en';
 // ─────────────────────────────────────────────────────
 
 // WMO 天氣代碼 → emoji
