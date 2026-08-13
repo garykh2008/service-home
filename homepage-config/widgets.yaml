@@ -13,11 +13,10 @@
       timeStyle: short
       hourCycle: h23
 
-# 天氣：openmeteo 免 API key。座標預設台北，可自行改。
+# 天氣：openmeteo 免 API key。
+# 不指定座標 → 用瀏覽器定位，天氣跟著你當下所在地，與頁首主時鐘一致。
+# （HTTPS 下首次會請求定位權限；若拒絕則不顯示天氣。想固定某地就填回
+#  latitude / longitude / label。）
 - openmeteo:
-    label: 台北
-    latitude: 25.0330
-    longitude: 121.5654
-    timezone: Asia/Taipei
     units: metric
     cache: 5
