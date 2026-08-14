@@ -52,29 +52,6 @@ pages:
           - type: to-do
             id: main
 
-          - type: bookmarks
-            groups:
-              - title: 後台管理
-                links:
-                  - title: Cloudflare
-                    url: https://dash.cloudflare.com
-                    icon: si:cloudflare
-                  - title: DuckDNS
-                    url: https://www.duckdns.org
-                    icon: di:duckdns
-              - title: 程式碼
-                links:
-                  - title: service-home
-                    url: https://github.com/garykh2008/service-home
-                    icon: si:github
-              - title: 文件
-                links:
-                  - title: Glance Docs
-                    url: https://github.com/glanceapp/glance
-                  - title: Caddy Docs
-                    url: https://caddyserver.com/docs/
-                    icon: si:caddy
-
       - size: full
         widgets:
           - type: monitor
@@ -119,6 +96,29 @@ pages:
             servers:
               - type: local
                 name: VPS
+
+          - type: bookmarks
+            groups:
+              - title: 後台管理
+                links:
+                  - title: Cloudflare
+                    url: https://dash.cloudflare.com
+                    icon: si:cloudflare
+                  - title: DuckDNS
+                    url: https://www.duckdns.org
+                    icon: di:duckdns
+              - title: 程式碼
+                links:
+                  - title: service-home
+                    url: https://github.com/garykh2008/service-home
+                    icon: si:github
+              - title: 文件
+                links:
+                  - title: Glance Docs
+                    url: https://github.com/glanceapp/glance
+                  - title: Caddy Docs
+                    url: https://caddyserver.com/docs/
+                    icon: si:caddy
 
   - name: News
     slug: news
