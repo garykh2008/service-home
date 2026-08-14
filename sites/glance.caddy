@@ -1,0 +1,9 @@
+glance.garyhsieh-proj.com {
+	# 登入保護（basic_auth）。跟 home 共用同一組帳密（同一人用），
+	# hash 一樣從環境變數 HOME_AUTH_HASH 帶入，不進版控。
+	basic_auth {
+		gary {$HOME_AUTH_HASH}
+	}
+
+	reverse_proxy 127.0.0.1:3052
+}

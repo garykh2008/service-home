@@ -25,5 +25,22 @@ services:
     restart: unless-stopped
     # 與 homepage 同一個 compose 網路，homepage widget 可用 http://uptime-kuma:3001 連它
 
+  glance:
+    image: glanceapp/glance:latest
+    container_name: glance
+    ports:
+      # 只綁 localhost，對外走 Caddy（glance.garyhsieh-proj.com）
+      - 127.0.0.1:3052:8080
+    volumes:
+      - ./glance-config:/app/config
+    environment:
+      TZ: Asia/Taipei
+    # 給之後可能需要的密碼類設定用（例如 monitor widget 對有 basic_auth 的站做檢查）；
+    # .env 不存在也不會噴錯（Compose 2.24+）。
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+
 volumes:
   uptime-kuma-data:

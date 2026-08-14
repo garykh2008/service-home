@@ -1,0 +1,81 @@
+server:
+  port: 8080
+  proxied: true # 在 Caddy 反向代理後面
+
+theme:
+  # 跟 Homepage 的 slate 深色 + sky 強調色一致，兩個 dashboard 看起來像同一套
+  background-color: 222 47 11
+  primary-color: 199 89 48
+  positive-color: 142 71 45
+  negative-color: 0 84 60
+
+pages:
+  - name: Home
+    slug: home
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 24h
+            timezones:
+              - timezone: America/Los_Angeles
+                label: SF
+              - timezone: Asia/Taipei
+                label: 新竹
+
+          - type: markets
+            # TWD=X（USD/TWD 外匯）待部署後驗證 Glance 的行情來源支不支援；
+            # BTC-USD 當保底範例，確保這張卡至少有資料可看。
+            markets:
+              - symbol: TWD=X
+                name: USD/TWD
+              - symbol: BTC-USD
+                name: Bitcoin
+
+      - size: full
+        widgets:
+          - type: monitor
+            title: 服務健康
+            cache: 1m
+            sites:
+              # 先放沒有 basic_auth 的服務；home/routine/supabase 需要額外帶認證，
+              # 見 README「Glance pilot」一節，之後要加再補。
+              - title: VPS Dashboard
+                url: https://dashboard.garyhsieh-proj.com
+                icon: mdi:view-dashboard
+              - title: Quick Portal
+                url: https://portal.garyhsieh-proj.com
+                icon: mdi:send
+              - title: DevHub
+                url: https://devhub.garyhsieh-proj.com
+                icon: mdi:code-braces
+              - title: 繪本庫
+                url: https://library.garyhsieh-proj.com
+                icon: mdi:book-open-page-variant
+              - title: ntfy
+                url: https://notify.garyhsieh-proj.com
+                icon: mdi:bell-ring
+              - title: mangan-log
+                url: https://mangan-log.garyhsieh-proj.com
+                icon: mdi:heart-pulse
+
+          - type: hacker-news
+            limit: 8
+            sort-by: top
+            collapse-after: 5
+
+      - size: small
+        widgets:
+          - type: rss
+            title: 中央社科技
+            limit: 6
+            feeds:
+              - url: https://feeds.feedburner.com/rsscna/technology
+                title: 中央社科技
+
+          - type: rss
+            title: The Verge
+            limit: 6
+            feeds:
+              - url: https://www.theverge.com/rss/index.xml
+                title: The Verge

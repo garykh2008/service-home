@@ -16,8 +16,10 @@ homepage-config/            # 掛載進容器的 /app/config，YAML 皆版控
   bookmarks.yaml           #   快速連結（後台 / 程式碼 / 文件）
   custom.js                #   頁首補當前城市；底部資訊卡（匯率/世界時鐘/預報/HN）
   custom.css               #   custom.js 的樣式
-sites/home.caddy            # Caddy 反向代理（home，含 basic_auth），部署到 /etc/caddy/sites/
+sites/home.caddy            # Caddy 反向代理（home，含 basic_auth + /kuma 同源代理）
 sites/status.caddy          # Caddy 反向代理（Uptime Kuma）
+sites/glance.caddy          # Caddy 反向代理（Glance pilot，共用 home 的登入）
+glance-config/glance.yml    # Glance 設定（見下方「Glance pilot」）
 ```
 
 ## 部署
@@ -102,6 +104,39 @@ Cloudflare 加 `mangan-log.garyhsieh-proj.com` A 記錄（灰雲）。確認新�
    （用各服務的公開網址即可，例如 `https://dashboard.garyhsieh-proj.com`）。
 4. 建一個 **Status Page**，slug 設為 **`home`**（要與 `services.yaml` 的 widget `slug` 一致），
    把 monitors 加進去、發布。之後 homepage「監控」分頁的卡片就會顯示 up/down 統計。
+
+## Glance pilot（評估中，尚未取代 custom.js）
+
+`glance.garyhsieh-proj.com` 是 [Glance](https://github.com/glanceapp/glance) 的**試駕**，
+目的是評估要不要拿它取代 Homepage 底部手刻的資訊面板（新聞/世界時鐘/匯率/監控概覽等）。
+詳見規劃文件裡的比較與決策脈絡（`custom.js vs Glance`）。
+
+**這階段做了什麼**：`glance-config/glance.yml` 重建了 3 類代表性 widget——
+世界時鐘 + 匯率行情（`clock` / `markets`）、服務健康監控 + Hacker News
+（`monitor` / `hacker-news`）、中央社科技 + The Verge 的 RSS（`rss` ×2）。
+主題色刻意對齊 Homepage 的 slate 深色 + sky 強調色，兩邊看起來像同一套。
+
+**已知限制 / 待確認**（實測後回頭調整）：
+- `monitor` 的服務清單先只放**沒有 basic_auth** 的 6 個服務；`home`、`routine`、
+  `supabase` 需要額外認證（`basic-auth:` 欄位或標頭），先略過，之後要補再說。
+- `markets` 的 `TWD=X`（USD/TWD 外匯）行不行需要部署後實際看一次。
+- 待辦、便條、倒數 Glance 沒有原生 widget（要嘛用 `html` widget 補、要嘛繼續留在 Homepage）。
+
+一次性部署：
+
+1. VPS：`docker compose up -d`（拉起 `glance` 容器）。
+2. Caddy：`cp sites/glance.caddy /etc/caddy/sites/` → validate → reload；
+   Cloudflare 加 `glance.garyhsieh-proj.com` A 記錄（灰雲）。
+3. 開 `https://glance.garyhsieh-proj.com`（沿用 home 的登入帳密）。
+
+**評估清單**（用個幾天再回來決定）：
+- [ ] 三張代表性 widget 資料都正常顯示（monitor 綠、markets 兩檔都有數字、RSS/HN 有內容）
+- [ ] 外觀跟 Homepage 放在一起會不會突兀
+- [ ] 比手刻 custom.js 好維護嗎？想加新聞來源/城市會不會比改 JS 輕鬆
+- [ ] 決定：維持 custom.js／Glance 當資訊入口（獨立分頁連結）／Glance 當主入口
+
+修改 `glance-config/glance.yml` 後，跟 Homepage 一樣通常不需重建容器；
+沒生效再 `docker compose restart glance`。
 
 ## home 頁面登入（basic_auth）
 
