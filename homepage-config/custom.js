@@ -20,6 +20,16 @@ const NEWS = [
   { title: '中央社科技', type: 'rss', url: 'https://feeds.feedburner.com/rsscna/technology', count: 4 },
   { title: 'The Verge', type: 'rss', url: 'https://www.theverge.com/rss/index.xml', count: 4 },
 ];
+
+// 監控概覽 / 服務延遲：讀 Uptime Kuma 狀態頁。
+// 走 home 的同源代理 /kuma（home.caddy 需有 handle_path /kuma/*），避免 CORS。
+const KUMA_BASE = '/kuma';
+const KUMA_SLUG = 'home';
+
+// 倒數（可多筆）；date 用當地時間 ISO 字串
+const COUNTDOWNS = [
+  { label: '（範例，改成你的）', date: '2026-12-24T18:00:00' },
+];
 // ─────────────────────────────────────────────────────
 
 const LOCALE = CITY_LANG === 'zh' ? 'zh-TW' : 'en-US';
@@ -130,9 +140,13 @@ function ensureExtras() {
         `<div class="xw-card"><div class="xw-title">${n.title}</div><div class="xw-body xw-news" id="xw-news-${i}">…</div></div>`
     ).join('');
     root.innerHTML = `
+      <div class="xw-status" id="xw-status">監控概覽讀取中…</div>
       <div class="xw-card"><div class="xw-title">匯率</div><div class="xw-body" id="xw-exchange">…</div></div>
       <div class="xw-card"><div class="xw-title">世界時鐘</div><div class="xw-body" id="xw-clocks"></div></div>
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
+      <div class="xw-card"><div class="xw-title">服務延遲</div><div class="xw-body" id="xw-latency">…</div></div>
+      <div class="xw-card"><div class="xw-title">便條</div><textarea id="xw-notes-input" class="xw-notes" placeholder="隨手記…"></textarea></div>
+      <div class="xw-card"><div class="xw-title">倒數</div><div class="xw-body" id="xw-countdown">…</div></div>
       ${newsCards}`;
   }
   if (footer && footer.parentNode) {
@@ -218,6 +232,83 @@ function renderAllNews() {
   NEWS.forEach((_, i) => renderNewsSource(i));
 }
 
+// 監控概覽 + 服務延遲（讀 Uptime Kuma 狀態頁，經 /kuma 同源代理）
+async function renderKuma() {
+  const summary = document.getElementById('xw-status');
+  const latBox = document.getElementById('xw-latency');
+  try {
+    const [page, hb] = await Promise.all([
+      fetchJSON(`${KUMA_BASE}/api/status-page/${KUMA_SLUG}`),
+      fetchJSON(`${KUMA_BASE}/api/status-page/heartbeat/${KUMA_SLUG}`),
+    ]);
+    const names = {};
+    (page.publicGroupList || []).forEach((g) =>
+      (g.monitorList || []).forEach((m) => (names[m.id] = m.name))
+    );
+    let up = 0, down = 0;
+    const downNames = [];
+    const lat = [];
+    Object.keys(hb.heartbeatList || {}).forEach((id) => {
+      const beats = hb.heartbeatList[id];
+      const last = beats && beats[beats.length - 1];
+      if (!last) return;
+      if (last.status === 1) up++;
+      else { down++; downNames.push(names[id] || id); }
+      if (last.ping != null) lat.push({ name: names[id] || id, ping: last.ping });
+    });
+    const total = up + down;
+    if (summary) {
+      const ok = down === 0;
+      const avg = lat.length ? Math.round(lat.reduce((a, b) => a + b.ping, 0) / lat.length) : null;
+      summary.className = 'xw-status ' + (ok ? 'ok' : 'bad');
+      summary.textContent = ok
+        ? `🟢 全部服務正常　·　${up}/${total}${avg != null ? `　·　平均 ${avg}ms` : ''}`
+        : `🔴 ${down} 項異常：${downNames.join('、')}　·　${up}/${total} 正常`;
+    }
+    if (latBox) {
+      lat.sort((a, b) => b.ping - a.ping);
+      latBox.innerHTML = lat
+        .map((x) => `<div class="xw-row"><span>${x.name}</span><span>${x.ping}ms</span></div>`)
+        .join('') || '—';
+    }
+  } catch (e) {
+    if (summary) { summary.className = 'xw-status'; summary.textContent = '監控概覽：讀不到（需 home.caddy 的 /kuma 代理已部署）'; }
+    if (latBox) latBox.textContent = '—';
+  }
+}
+
+// 便條：存 localStorage
+function initNotes() {
+  const ta = document.getElementById('xw-notes-input');
+  if (!ta || ta.dataset.bound) return;
+  ta.value = localStorage.getItem('xw-notes') || '';
+  ta.addEventListener('input', () => localStorage.setItem('xw-notes', ta.value));
+  ta.dataset.bound = '1';
+}
+
+// 倒數
+function renderCountdown() {
+  const box = document.getElementById('xw-countdown');
+  if (!box) return;
+  const now = Date.now();
+  box.innerHTML = COUNTDOWNS.map((c) => {
+    const t = new Date(c.date).getTime();
+    let txt;
+    if (isNaN(t)) txt = '?';
+    else {
+      const diff = t - now;
+      if (diff <= 0) txt = '已到';
+      else {
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        txt = d > 0 ? `${d} 天 ${h} 時` : `${h} 時 ${m} 分`;
+      }
+    }
+    return `<div class="xw-row"><span>${c.label}</span><span>${txt}</span></div>`;
+  }).join('');
+}
+
 async function init() {
   ensureExtras();
 
@@ -249,6 +340,9 @@ async function init() {
   renderExchange();
   renderForecast(coords);
   renderAllNews();
+  renderKuma();
+  initNotes();
+  renderCountdown();
 
   // 定時更新（順便確保底部卡片還在；被 React 移除就重建並補資料）
   setInterval(() => {
@@ -257,8 +351,12 @@ async function init() {
       renderExchange();
       renderForecast(coords);
       renderAllNews();
+      renderKuma();
+      initNotes();
+      renderCountdown();
     } else {
       ensureExtras(); // 只是被搬走的話搬回
+      initNotes();
     }
     renderClocks(homeWeather);
     if (currentCity) appendCityToGreeting(currentCity);
@@ -266,6 +364,8 @@ async function init() {
   setInterval(refreshHomeWeather, 900000); // 家天氣 15 分
   setInterval(renderExchange, 3600000); // 匯率 1 小時
   setInterval(renderAllNews, 1800000); // 新聞 30 分
+  setInterval(renderKuma, 60000); // 監控概覽 1 分
+  setInterval(renderCountdown, 60000); // 倒數 1 分
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) renderClocks(homeWeather);
   });

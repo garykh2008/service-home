@@ -36,6 +36,38 @@ ul.services-list > li.service > div {
   border-radius: 0.75rem;
   padding: 0.85rem 1rem;
 }
+
+/* 監控概覽橫幅：跨整排 */
+#extra-widgets .xw-status {
+  grid-column: 1 / -1;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.55);
+}
+#extra-widgets .xw-status.ok {
+  color: #4ade80; /* green-400 */
+  border-color: rgba(74, 222, 128, 0.35);
+}
+#extra-widgets .xw-status.bad {
+  color: #f87171; /* red-400 */
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(80, 20, 20, 0.4);
+}
+
+/* 便條 textarea */
+#extra-widgets .xw-notes {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: vertical;
+  background: rgba(2, 6, 23, 0.4);
+  color: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font: inherit;
+}
 #extra-widgets .xw-title {
   font-size: 0.72rem;
   text-transform: uppercase;
