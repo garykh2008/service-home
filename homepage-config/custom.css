@@ -124,6 +124,48 @@ ul.services-list > li.service > div {
   font: inherit;
 }
 
+/* 倒數：每項一個大數字 */
+#extra-widgets .xw-cd-item {
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+#extra-widgets .xw-cd-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+#extra-widgets .xw-cd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+#extra-widgets .xw-cd-label {
+  font-weight: 500;
+}
+#extra-widgets .xw-cd-num {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #38bdf8; /* sky-400 */
+  font-variant-numeric: tabular-nums;
+}
+#extra-widgets .xw-cd-num.soon {
+  color: #fbbf24; /* amber-400：即將到 */
+}
+#extra-widgets .xw-cd-num.done {
+  color: rgb(148 163 184);
+  font-size: 1.1rem;
+}
+#extra-widgets .xw-cd-unit {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-left: 0.15rem;
+  opacity: 0.8;
+}
+#extra-widgets .xw-cd-sub {
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
 /* 倒數：新增表單 */
 #extra-widgets .xw-cd-form {
   display: flex;

@@ -403,27 +403,31 @@ function loadCountdowns() {
 function saveCountdowns(list) {
   localStorage.setItem('xw-countdowns', JSON.stringify(list));
 }
+function fmtRemain(t) {
+  if (isNaN(t)) return { num: '?', unit: '', cls: '' };
+  const diff = t - Date.now();
+  if (diff <= 0) return { num: '已到', unit: '', cls: 'done' };
+  const d = Math.floor(diff / 86400000);
+  if (d === 0) return { num: Math.max(1, Math.floor(diff / 3600000)), unit: '小時', cls: 'soon' };
+  return { num: d, unit: '天', cls: d <= 7 ? 'soon' : '' };
+}
 function renderCountdown() {
   const box = document.getElementById('xw-countdown');
   if (!box) return;
   const list = loadCountdowns();
-  const now = Date.now();
   box.innerHTML = list.length
     ? list
         .map((c, i) => {
-          const t = new Date(c.date).getTime();
-          let txt;
-          if (isNaN(t)) txt = '?';
-          else {
-            const diff = t - now;
-            if (diff <= 0) txt = '已到';
-            else {
-              const d = Math.floor(diff / 86400000);
-              const h = Math.floor((diff % 86400000) / 3600000);
-              txt = d > 0 ? `${d} 天` : `${h} 時`;
-            }
-          }
-          return `<div class="xw-row" title="${escapeHtml(c.date)}"><span>${escapeHtml(c.label)}</span><span>${txt} <a class="xw-cd-remove" data-i="${i}" title="移除">×</a></span></div>`;
+          const dObj = new Date(c.date);
+          const dstr = isNaN(dObj.getTime())
+            ? ''
+            : new Intl.DateTimeFormat('zh-TW', { month: 'numeric', day: 'numeric', weekday: 'short' }).format(dObj);
+          const r = fmtRemain(dObj.getTime());
+          return `<div class="xw-cd-item">
+            <div class="xw-cd-head"><span class="xw-cd-label">${escapeHtml(c.label)}</span><a class="xw-cd-remove" data-i="${i}" title="移除">×</a></div>
+            <div class="xw-cd-num ${r.cls}">${r.num}<span class="xw-cd-unit">${r.unit}</span></div>
+            ${dstr ? `<div class="xw-cd-sub">${dstr}</div>` : ''}
+          </div>`;
         })
         .join('')
     : '<div class="xw-row" style="opacity:.6">尚無項目</div>';
