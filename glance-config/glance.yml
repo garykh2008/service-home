@@ -32,6 +32,8 @@ pages:
             units: metric
             hour-format: 24h
 
+      - size: small
+        widgets:
           - type: markets
             markets:
               - symbol: TWD=X
@@ -53,6 +55,7 @@ pages:
                     icon: si:cloudflare
                   - title: DuckDNS
                     url: https://www.duckdns.org
+                    icon: di:duckdns
               - title: 程式碼
                 links:
                   - title: service-home
@@ -64,6 +67,7 @@ pages:
                     url: https://github.com/glanceapp/glance
                   - title: Caddy Docs
                     url: https://caddyserver.com/docs/
+                    icon: si:caddy
 
       - size: full
         widgets:
@@ -92,7 +96,7 @@ pages:
                   - 401
               - title: ntfy
                 url: https://notify.garyhsieh-proj.com
-                icon: mdi:message-badge
+                icon: di:ntfy
               - title: Supabase
                 url: https://supabase.garyhsieh-proj.com
                 icon: si:supabase
