@@ -17,6 +17,12 @@ pages:
     columns:
       - size: small
         widgets:
+          - type: search
+            search-engine: duckduckgo
+            new-tab: false
+            autofocus: false
+            placeholder: "搜尋…（! 開頭可用 DDG bangs，如 !yt、!g）"
+
           - type: clock
             hour-format: 24h
             timezones:
