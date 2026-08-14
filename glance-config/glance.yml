@@ -44,6 +44,27 @@ pages:
           - type: to-do
             id: main
 
+          - type: bookmarks
+            groups:
+              - title: 後台管理
+                links:
+                  - title: Cloudflare
+                    url: https://dash.cloudflare.com
+                    icon: si:cloudflare
+                  - title: DuckDNS
+                    url: https://www.duckdns.org
+              - title: 程式碼
+                links:
+                  - title: service-home
+                    url: https://github.com/garykh2008/service-home
+                    icon: si:github
+              - title: 文件
+                links:
+                  - title: Glance Docs
+                    url: https://github.com/glanceapp/glance
+                  - title: Caddy Docs
+                    url: https://caddyserver.com/docs/
+
       - size: full
         widgets:
           - type: monitor
@@ -89,45 +110,31 @@ pages:
               - type: local
                 name: VPS
 
+  - name: News
+    slug: news
+    columns:
+      - size: full
+        widgets:
           - type: hacker-news
-            limit: 8
+            limit: 10
             sort-by: top
-            collapse-after: 5
+            collapse-after: 8
 
       - size: small
         widgets:
-          - type: bookmarks
-            groups:
-              - title: 後台管理
-                links:
-                  - title: Cloudflare
-                    url: https://dash.cloudflare.com
-                    icon: si:cloudflare
-                  - title: DuckDNS
-                    url: https://www.duckdns.org
-              - title: 程式碼
-                links:
-                  - title: service-home
-                    url: https://github.com/garykh2008/service-home
-                    icon: si:github
-              - title: 文件
-                links:
-                  - title: Glance Docs
-                    url: https://github.com/glanceapp/glance
-                  - title: Caddy Docs
-                    url: https://caddyserver.com/docs/
-
           - type: rss
             title: 中央社科技
-            limit: 6
-            single-line-titles: true # 標題截斷成一行＋省略號，跟 Homepage 舊版一樣，避免長標題亂折行
+            limit: 8
+            single-line-titles: true
             feeds:
               - url: https://feeds.feedburner.com/rsscna/technology
                 title: 中央社科技
 
+      - size: small
+        widgets:
           - type: rss
             title: The Verge
-            limit: 6
+            limit: 8
             single-line-titles: true
             feeds:
               - url: https://www.theverge.com/rss/index.xml

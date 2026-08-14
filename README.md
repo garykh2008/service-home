@@ -90,12 +90,16 @@ VPS=root@你的VPS npm run deploy
 
 ## Glance 設定（`glance-config/glance.yml`）
 
-一個 YAML 檔管全部，三欄版面：
+一個 YAML 檔管全部，兩個分頁：
 
-- **左欄**：`clock`(SF/新竹世界時鐘)、`markets`(USD/TWD 匯率 + BTC-USD 行情)、
-  `to-do`(待辦，內建儲存)。
-- **中欄**：`monitor`(服務健康，見上表)、`hacker-news`。
-- **右欄**：`bookmarks`(後台管理/程式碼/文件快速連結)、`rss`(中央社科技、The Verge)。
+**Home**
+- **左欄**：`clock`(SF/新竹世界時鐘)、`weather`(新竹天氣，固定地點)、
+  `markets`(USD/TWD、TWD/JPY 匯率)、`to-do`(待辦，內建儲存)、`bookmarks`(快速連結)。
+- **右欄**：`monitor`(服務健康，見上表)、`server-stats`(VPS CPU/記憶體)。
+
+**News**
+- **左欄**：`hacker-news`。
+- **中/右欄**：`rss`(中央社科技、The Verge)。
 
 主題色對齊原本 Homepage 的 slate 深色 + sky 強調色（`theme:` 區塊；**`light: false`
 必須明確寫**，不然整組主題會被 Glance 判定不完整而退回內建預設）。
