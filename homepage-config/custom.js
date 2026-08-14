@@ -13,7 +13,13 @@ const CITIES = [
 ];
 const EXCHANGE = { from: 'USD', to: 'TWD' }; // 匯率
 const FORECAST_DAYS = 3; // 多日預報天數（所在地）
-const NEWS_COUNT = 4; // Hacker News 頭條數
+
+// 新聞來源（每個一張卡）；type: 'hn'=Hacker News、'rss'=任意 RSS（經 rss2json 代理）
+const NEWS = [
+  { title: 'Hacker News', type: 'hn', count: 4 },
+  { title: '中央社科技', type: 'rss', url: 'https://feeds.feedburner.com/rsscna/technology', count: 4 },
+  { title: 'The Verge', type: 'rss', url: 'https://www.theverge.com/rss/index.xml', count: 4 },
+];
 // ─────────────────────────────────────────────────────
 
 const LOCALE = CITY_LANG === 'zh' ? 'zh-TW' : 'en-US';
@@ -117,11 +123,15 @@ function ensureExtras() {
   if (!root) {
     root = document.createElement('div');
     root.id = 'extra-widgets';
+    const newsCards = NEWS.map(
+      (n, i) =>
+        `<div class="xw-card"><div class="xw-title">${n.title}</div><div class="xw-body xw-news" id="xw-news-${i}">…</div></div>`
+    ).join('');
     root.innerHTML = `
       <div class="xw-card"><div class="xw-title">匯率</div><div class="xw-body" id="xw-exchange">…</div></div>
       <div class="xw-card"><div class="xw-title">世界時鐘</div><div class="xw-body" id="xw-clocks"></div></div>
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
-      <div class="xw-card"><div class="xw-title">Hacker News</div><div class="xw-body xw-news" id="xw-news">…</div></div>`;
+      ${newsCards}`;
   }
   if (anchor) {
     if (anchor.nextSibling !== root) anchor.parentNode.insertBefore(root, anchor.nextSibling);
@@ -172,24 +182,36 @@ async function renderForecast(coords) {
   }
 }
 
-async function renderNews() {
-  const box = document.getElementById('xw-news');
+async function renderNewsSource(i) {
+  const box = document.getElementById(`xw-news-${i}`);
   if (!box) return;
+  const src = NEWS[i];
   try {
-    const ids = await fetchJSON('https://hacker-news.firebaseio.com/v0/topstories.json');
-    const items = await Promise.all(
-      ids.slice(0, NEWS_COUNT).map((id) => fetchJSON(`https://hacker-news.firebaseio.com/v0/item/${id}.json`))
-    );
+    let items;
+    if (src.type === 'hn') {
+      const ids = await fetchJSON('https://hacker-news.firebaseio.com/v0/topstories.json');
+      const raw = await Promise.all(
+        ids.slice(0, src.count).map((id) => fetchJSON(`https://hacker-news.firebaseio.com/v0/item/${id}.json`))
+      );
+      items = raw.map((it) => ({ title: it.title, url: it.url || `https://news.ycombinator.com/item?id=${it.id}` }));
+    } else {
+      // 任意 RSS 經 rss2json 代理轉 JSON
+      const j = await fetchJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(src.url));
+      items = (j.items || []).slice(0, src.count).map((it) => ({ title: it.title, url: it.link }));
+    }
     box.innerHTML = items
       .map((it) => {
-        const url = it.url || `https://news.ycombinator.com/item?id=${it.id}`;
         const title = (it.title || '').replace(/"/g, '&quot;');
-        return `<a href="${url}" target="_blank" rel="noopener" title="${title}">• ${it.title}</a>`;
+        return `<a href="${it.url}" target="_blank" rel="noopener" title="${title}">• ${it.title}</a>`;
       })
       .join('');
   } catch (e) {
     box.textContent = '—';
   }
+}
+
+function renderAllNews() {
+  NEWS.forEach((_, i) => renderNewsSource(i));
 }
 
 async function init() {
@@ -222,7 +244,7 @@ async function init() {
   refreshHomeWeather();
   renderExchange();
   renderForecast(coords);
-  renderNews();
+  renderAllNews();
 
   // 定時更新（順便確保底部卡片還在；被 React 移除就重建並補資料）
   setInterval(() => {
@@ -230,7 +252,7 @@ async function init() {
       ensureExtras();
       renderExchange();
       renderForecast(coords);
-      renderNews();
+      renderAllNews();
     } else {
       ensureExtras(); // 只是被搬走的話搬回
     }
@@ -239,7 +261,7 @@ async function init() {
   }, 30000);
   setInterval(refreshHomeWeather, 900000); // 家天氣 15 分
   setInterval(renderExchange, 3600000); // 匯率 1 小時
-  setInterval(renderNews, 1800000); // 新聞 30 分
+  setInterval(renderAllNews, 1800000); // 新聞 30 分
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) renderClocks(homeWeather);
   });

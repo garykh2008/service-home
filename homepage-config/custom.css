@@ -66,4 +66,5 @@ ul.services-list > li.service > div {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0.15rem 0;
+  line-height: 1.4;
 }
