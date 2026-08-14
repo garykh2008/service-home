@@ -25,6 +25,13 @@ pages:
               - timezone: Asia/Taipei
                 label: 新竹
 
+          - type: weather
+            # 固定地點（Glance 是伺服器端渲染，不像舊 custom.js 會跟著你當下位置跑）；
+            # 先設家（新竹）。想再加你目前所在地也可以，跟我說地點就加一個。
+            location: Hsinchu, Taiwan
+            units: metric
+            hour-format: 24h
+
           - type: markets
             markets:
               - symbol: TWD=X
@@ -74,6 +81,13 @@ pages:
               - title: mangan-log
                 url: https://mangan-log.garyhsieh-proj.com
                 icon: mdi:heart-pulse
+
+          - type: server-stats
+            # 容器共用 host 的核心，CPU/記憶體應該準；磁碟用量可能只反映容器自己的
+            # 檔案系統（不是 host 真實磁碟），部署後看數字對不對再說，不對就拿掉/不理磁碟那欄。
+            servers:
+              - type: local
+                name: VPS
 
           - type: hacker-news
             limit: 8
