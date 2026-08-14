@@ -116,9 +116,11 @@ function appendCityToGreeting(city) {
 }
 
 // ── 底部資訊卡 ────────────────────────────────────────
-// 插在 bookmarks 正後方（footer 之前），貼著內容、不會被 min-h-screen 推到頁尾留大縫。
+// 插在 #footer 之前：footer 一直都在、與分頁無關，所以底部卡片切到任何分頁都常駐，
+// 也不會被 min-h-screen 推到頁尾留大縫。
 function ensureExtras() {
-  const anchor = document.getElementById('bookmarks') || document.getElementById('layout-groups');
+  const footer = document.getElementById('footer');
+  const fallback = document.getElementById('bookmarks') || document.getElementById('layout-groups');
   let root = document.getElementById('extra-widgets');
   if (!root) {
     root = document.createElement('div');
@@ -133,8 +135,10 @@ function ensureExtras() {
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
       ${newsCards}`;
   }
-  if (anchor) {
-    if (anchor.nextSibling !== root) anchor.parentNode.insertBefore(root, anchor.nextSibling);
+  if (footer && footer.parentNode) {
+    if (footer.previousElementSibling !== root) footer.parentNode.insertBefore(root, footer);
+  } else if (fallback) {
+    if (fallback.nextSibling !== root) fallback.parentNode.insertBefore(root, fallback.nextSibling);
   } else if (!root.parentElement) {
     document.body.appendChild(root); // 保底
   }

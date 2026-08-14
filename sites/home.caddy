@@ -1,3 +1,9 @@
 home.garyhsieh-proj.com {
+	# 登入保護（basic_auth）。密碼 hash 從環境變數 HOME_AUTH_HASH 帶入，不進版控。
+	# 設定方式見 README「home 頁面登入」。
+	basic_auth {
+		gary {$HOME_AUTH_HASH}
+	}
+
 	reverse_proxy 127.0.0.1:3050
 }

@@ -19,11 +19,22 @@ quicklaunch:
   hideInternetSearch: false
   provider: duckduckgo
 
-# 群組排列（順序與欄數）
+# 群組排列（分頁 / 順序 / 欄數）
+# tab：同一 tab 的群組會分到同一分頁；底部資訊卡（custom.js）與分頁無關、常駐。
 layout:
+  # ── 分頁：服務 ──
   核心服務:
+    tab: 服務
     style: row
     columns: 3
   工具與資料:
+    tab: 服務
     style: row
     columns: 3
+  # ── 分頁：連結 ──（bookmarks 群組）
+  後台管理:
+    tab: 連結
+  程式碼:
+    tab: 連結
+  文件:
+    tab: 連結

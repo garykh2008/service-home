@@ -86,6 +86,36 @@ VPS 端一次性：放好 `sites/mangan-log.caddy` → `caddy validate` → `rel
 Cloudflare 加 `mangan-log.garyhsieh-proj.com` A 記錄（灰雲）。確認新網域可用後，
 即可在 Coolify 刪掉舊 app；若 Coolify 已無其他負載，可整套退役。
 
+## home 頁面登入（basic_auth）
+
+`sites/home.caddy` 用 `basic_auth` 保護整頁，密碼 hash 由環境變數
+`HOME_AUTH_HASH` 帶入（不寫進版控）。在 VPS 上一次性設定：
+
+```bash
+# 1. 產生密碼 hash（會輸出 $2a$... 一長串，複製它）
+caddy hash-password --plaintext '你的密碼'
+
+# 2. 寫進 Caddy 的環境檔（值照貼，$ 不必跳脫）
+echo 'HOME_AUTH_HASH=貼上剛才的hash' | sudo tee /etc/caddy/caddy.env
+
+# 3. 讓 caddy.service 讀這個環境檔
+sudo systemctl edit caddy      # 在編輯區加入：
+#   [Service]
+#   EnvironmentFile=/etc/caddy/caddy.env
+sudo systemctl daemon-reload
+
+# 4. 驗證 + 套用（手動 validate 前先 export，否則佔位符是空的）
+export HOME_AUTH_HASH=貼上剛才的hash
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+```
+
+之後開 `home.garyhsieh-proj.com` 會跳出登入框（帳號 `gary` + 你設的密碼），
+瀏覽器記住後就不用每次輸入。想改帳號/多帳號，改 `sites/home.caddy` 的 `basic_auth` 區塊。
+
+> 想省事也可以把 hash 直接寫進 `sites/home.caddy`（取代 `{$HOME_AUTH_HASH}`），
+> 但那樣 hash 會進 git——**公開 repo 請務必用強密碼，或維持環境變數作法**。
+
 ## 修改設定
 
 改完 `homepage-config/*.yaml` 後，Homepage 會自動重讀，多數情況不需重啟容器；
