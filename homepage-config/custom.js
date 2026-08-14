@@ -178,6 +178,37 @@ function renderClocks(homeWeather) {
   }).join('');
 }
 
+// 近 N 日匯率（fawazahmed0 currency-api，走 jsDelivr CDN，免金鑰）；回傳舊→新
+async function fxHistory(from, to, days) {
+  const f = from.toLowerCase(), t = to.toLowerCase();
+  const now = new Date();
+  const reqs = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(now.getTime() - i * 86400000).toISOString().slice(0, 10);
+    reqs.push(
+      fetchJSON(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${d}/v1/currencies/${f}.json`)
+        .then((j) => ({ d, rate: j && j[f] && j[f][t] }))
+        .catch(() => null)
+    );
+  }
+  const res = await Promise.all(reqs);
+  return res.filter((x) => x && x.rate != null).sort((a, b) => a.d.localeCompare(b.d));
+}
+
+// 極簡 sparkline（單色線，非縮放筆畫，無座標軸）
+function sparklineSvg(values) {
+  const n = values.length;
+  if (n < 2) return '';
+  const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
+  const W = 120, H = 28, pad = 3;
+  const pts = values.map((v, i) => {
+    const x = pad + (i / (n - 1)) * (W - 2 * pad);
+    const y = pad + (1 - (v - min) / span) * (H - 2 * pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  return `<svg class="xw-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(' ')}" fill="none" stroke="#38bdf8" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+
 async function renderExchange() {
   const box = document.getElementById('xw-exchange');
   if (!box) return;
@@ -194,7 +225,23 @@ async function renderExchange() {
     box.innerHTML =
       `<div class="xw-big">1 ${EXCHANGE.from} = ${rate.toFixed(2)} ${EXCHANGE.to}</div>` +
       `<div class="xw-sub">1 ${EXCHANGE.to} = ${inv} ${EXCHANGE.from}</div>` +
-      (upd ? `<div class="xw-sub xw-muted">更新 ${upd}</div>` : '');
+      (upd ? `<div class="xw-sub xw-muted">更新 ${upd}</div>` : '') +
+      `<div id="xw-fx-spark"></div>`;
+    // 近 7 日走勢（失敗就不顯示，不影響上面數字）
+    try {
+      const hist = await fxHistory(EXCHANGE.from, EXCHANGE.to, 7);
+      if (hist.length >= 2) {
+        const vals = hist.map((h) => h.rate);
+        const pct = ((vals[vals.length - 1] - vals[0]) / vals[0]) * 100;
+        const arrow = pct >= 0 ? '▲' : '▼';
+        const el = document.getElementById('xw-fx-spark');
+        if (el) {
+          el.innerHTML =
+            sparklineSvg(vals) +
+            `<div class="xw-sub xw-muted">近 7 日 ${arrow} ${Math.abs(pct).toFixed(2)}%</div>`;
+        }
+      }
+    } catch (e) {}
   } catch (e) {
     box.textContent = '—';
   }
@@ -292,7 +339,8 @@ async function renderKuma() {
         lat
           .map((x) => {
             const w = Math.max(4, Math.round((x.ping / max) * 100));
-            return `<div class="xw-lat-row"><span class="xw-lat-name">${escapeHtml(x.name)}</span><span class="xw-lat-bar"><span class="xw-lat-fill" style="width:${w}%"></span></span><span class="xw-lat-val">${x.ping}ms</span></div>`;
+            const color = x.ping > 300 ? '#f87171' : x.ping > 100 ? '#fbbf24' : '#38bdf8';
+            return `<div class="xw-lat-row"><span class="xw-lat-name">${escapeHtml(x.name)}</span><span class="xw-lat-bar"><span class="xw-lat-fill" style="width:${w}%;background:${color}"></span></span><span class="xw-lat-val">${x.ping}ms</span></div>`;
           })
           .join('') || '—';
     }
