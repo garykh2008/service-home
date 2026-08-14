@@ -4,6 +4,8 @@ server:
 
 theme:
   # 跟 Homepage 的 slate 深色 + sky 強調色一致，兩個 dashboard 看起來像同一套
+  light: false
+  disable-picker: true # 別讓內建主題選色器蓋掉自訂色（也排除瀏覽器記住舊選擇的可能）
   background-color: 222 47 11
   primary-color: 199 89 48
   positive-color: 142 71 45
