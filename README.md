@@ -16,7 +16,8 @@ homepage-config/            # 掛載進容器的 /app/config，YAML 皆版控
   bookmarks.yaml           #   快速連結（後台 / 程式碼 / 文件）
   custom.js                #   頁首補當前城市；底部資訊卡（匯率/世界時鐘/預報/HN）
   custom.css               #   custom.js 的樣式
-sites/home.caddy            # Caddy 反向代理設定，部署到 /etc/caddy/sites/
+sites/home.caddy            # Caddy 反向代理（home，含 basic_auth），部署到 /etc/caddy/sites/
+sites/status.caddy          # Caddy 反向代理（Uptime Kuma）
 ```
 
 ## 部署
@@ -85,6 +86,22 @@ VPS=root@你的VPS npm run deploy
 VPS 端一次性：放好 `sites/mangan-log.caddy` → `caddy validate` → `reload`；
 Cloudflare 加 `mangan-log.garyhsieh-proj.com` A 記錄（灰雲）。確認新網域可用後，
 即可在 Coolify 刪掉舊 app；若 Coolify 已無其他負載，可整套退役。
+
+## 監控：Uptime Kuma
+
+`docker-compose.yml` 內含 `uptime-kuma` 容器（綁 `127.0.0.1:3051`，資料存 named volume）。
+它與 homepage 同一 compose 網路，所以 homepage 的 uptimekuma widget 可用
+`http://uptime-kuma:3001` 直連。
+
+一次性設定：
+
+1. VPS 啟動：`docker compose up -d`（會一起把 uptime-kuma 拉起來）。
+2. Caddy：`cp sites/status.caddy /etc/caddy/sites/` → validate → reload；
+   Cloudflare 加 `status.garyhsieh-proj.com` A 記錄（灰雲）。
+3. 開 `https://status.garyhsieh-proj.com` → 建管理員帳號 → 為每個服務新增 Monitor
+   （用各服務的公開網址即可，例如 `https://dashboard.garyhsieh-proj.com`）。
+4. 建一個 **Status Page**，slug 設為 **`home`**（要與 `services.yaml` 的 widget `slug` 一致），
+   把 monitors 加進去、發布。之後 homepage「監控」分頁的卡片就會顯示 up/down 統計。
 
 ## home 頁面登入（basic_auth）
 

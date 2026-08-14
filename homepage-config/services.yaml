@@ -72,9 +72,6 @@
         description: self-hosted（mangan-log 後端），API 閘道為 kong
         server: my-docker
         container: supabase-kong
-        #   mappings:
-        #     - field: 0.id
-        #       label: 範例欄位
 
     - mangan-log:
         icon: mdi-heart-pulse
@@ -83,3 +80,18 @@
         description: Manganle 服藥/健康追蹤 PWA（搭配上面 Supabase）
         # 靜態檔（/srv/mangan-log，走 Caddy），無對應容器；
         # 由 mangan-log repo 的 `npm run deploy` build+scp 佈署，已退出 Coolify
+
+- 監控:
+    - Uptime Kuma:
+        icon: uptime-kuma
+        href: https://status.garyhsieh-proj.com
+        siteMonitor: https://status.garyhsieh-proj.com
+        description: 服務健康牆（上/下線、回應時間、歷史）
+        server: my-docker
+        container: uptime-kuma
+        # 摘要 widget：讀 Uptime Kuma 狀態頁的 up/down 統計。
+        # 需先在 Uptime Kuma 建一個 slug 為 home 的「狀態頁」（Status Page）。
+        widget:
+          type: uptimekuma
+          url: http://uptime-kuma:3001
+          slug: home

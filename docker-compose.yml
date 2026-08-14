@@ -13,3 +13,17 @@ services:
       # Homepage 從反向代理後面被存取，需允許來源網域
       HOMEPAGE_ALLOWED_HOSTS: home.garyhsieh-proj.com
     restart: unless-stopped
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    ports:
+      # 只綁 localhost，對外走 Caddy（status.garyhsieh-proj.com）
+      - 127.0.0.1:3051:3001
+    volumes:
+      - uptime-kuma-data:/app/data
+    restart: unless-stopped
+    # 與 homepage 同一個 compose 網路，homepage widget 可用 http://uptime-kuma:3001 連它
+
+volumes:
+  uptime-kuma-data:

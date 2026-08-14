@@ -31,6 +31,11 @@ layout:
     tab: 服務
     style: row
     columns: 3
+  # ── 分頁：監控 ──
+  監控:
+    tab: 監控
+    style: row
+    columns: 3
   # ── 分頁：連結 ──（bookmarks 群組）
   後台管理:
     tab: 連結
