@@ -169,7 +169,12 @@ function renderClocks(homeWeather) {
   if (!box) return;
   box.innerHTML = CITIES.map((c) => {
     const w = c.home && homeWeather ? `　${homeWeather.emoji} ${homeWeather.temp}°` : '';
-    return `<div class="xw-row"><span>${c.label}${c.home ? ' 🏠' : ''}</span><span>${timeInTz(c.tz)}${w}</span></div>`;
+    const hour = parseInt(
+      new Intl.DateTimeFormat('en-GB', { timeZone: c.tz, hour: '2-digit', hourCycle: 'h23' }).format(new Date()),
+      10
+    );
+    const dn = hour >= 6 && hour < 18 ? '☀️' : '🌙';
+    return `<div class="xw-row"><span>${dn} ${c.label}${c.home ? ' 🏠' : ''}</span><span>${timeInTz(c.tz)}${w}</span></div>`;
   }).join('');
 }
 
@@ -179,7 +184,17 @@ async function renderExchange() {
   try {
     const j = await fetchJSON(`https://open.er-api.com/v6/latest/${EXCHANGE.from}`);
     const rate = j.rates[EXCHANGE.to];
-    box.innerHTML = `<div class="xw-big">1 ${EXCHANGE.from} = ${rate.toFixed(2)} ${EXCHANGE.to}</div>`;
+    const inv = (1 / rate).toFixed(4);
+    let upd = '';
+    if (j.time_last_update_unix) {
+      upd = new Intl.DateTimeFormat('zh-TW', {
+        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+      }).format(new Date(j.time_last_update_unix * 1000));
+    }
+    box.innerHTML =
+      `<div class="xw-big">1 ${EXCHANGE.from} = ${rate.toFixed(2)} ${EXCHANGE.to}</div>` +
+      `<div class="xw-sub">1 ${EXCHANGE.to} = ${inv} ${EXCHANGE.from}</div>` +
+      (upd ? `<div class="xw-sub xw-muted">更新 ${upd}</div>` : '');
   } catch (e) {
     box.textContent = '—';
   }
@@ -272,9 +287,14 @@ async function renderKuma() {
     }
     if (latBox) {
       lat.sort((a, b) => b.ping - a.ping);
-      latBox.innerHTML = lat
-        .map((x) => `<div class="xw-row"><span>${x.name}</span><span>${x.ping}ms</span></div>`)
-        .join('') || '—';
+      const max = lat.length ? lat[0].ping : 1;
+      latBox.innerHTML =
+        lat
+          .map((x) => {
+            const w = Math.max(4, Math.round((x.ping / max) * 100));
+            return `<div class="xw-lat-row"><span class="xw-lat-name">${escapeHtml(x.name)}</span><span class="xw-lat-bar"><span class="xw-lat-fill" style="width:${w}%"></span></span><span class="xw-lat-val">${x.ping}ms</span></div>`;
+          })
+          .join('') || '—';
     }
   } catch (e) {
     if (summary) { summary.className = 'xw-status'; summary.textContent = '監控概覽：讀不到（需 home.caddy 的 /kuma 代理已部署）'; }

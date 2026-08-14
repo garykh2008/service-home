@@ -21,9 +21,56 @@ ul.services-list > li.service > div {
   margin: 0.25rem 1rem 2.5rem; /* 對齊 services/bookmarks 的邊距 */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: start; /* 卡片各自貼齊內容高度，不被同排最高者拉高留白 */
   gap: 1rem;
   color: rgb(226 232 240); /* slate-200 */
   font-size: 0.9rem;
+}
+
+/* 匯率等的次要行 */
+#extra-widgets .xw-sub {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 0.15rem;
+}
+#extra-widgets .xw-muted {
+  opacity: 0.55;
+  font-size: 0.78rem;
+}
+
+/* 服務延遲：水平長條（單一色相、依 ms 比例、值標在右） */
+#extra-widgets .xw-lat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.14rem 0;
+}
+#extra-widgets .xw-lat-name {
+  flex: 0 0 5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#extra-widgets .xw-lat-bar {
+  flex: 1 1 auto;
+  height: 6px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+}
+#extra-widgets .xw-lat-fill {
+  display: block;
+  height: 100%;
+  background: #38bdf8; /* sky-400，單一色相表數量 */
+  border-radius: 999px;
+}
+#extra-widgets .xw-lat-val {
+  flex: 0 0 auto;
+  min-width: 3rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+  font-size: 0.8rem;
 }
 @media (min-width: 640px) {
   #extra-widgets {
