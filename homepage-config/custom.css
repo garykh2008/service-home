@@ -124,6 +124,57 @@ ul.services-list > li.service > div {
   font: inherit;
 }
 
+/* 待辦 TODO */
+#extra-widgets .xw-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.18rem 0;
+}
+#extra-widgets .xw-todo-box {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid rgba(148, 163, 184, 0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+#extra-widgets .xw-todo-box.on {
+  background: #38bdf8;
+  border-color: #38bdf8;
+}
+#extra-widgets .xw-todo-box.on::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  color: #0b1220;
+  font-size: 11px;
+  line-height: 15px;
+  text-align: center;
+  font-weight: 700;
+}
+#extra-widgets .xw-todo-text {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#extra-widgets .xw-todo-text.done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+#extra-widgets .xw-todo-remove {
+  flex: 0 0 auto;
+  cursor: pointer;
+  opacity: 0.4;
+  padding: 0 0.2rem;
+}
+#extra-widgets .xw-todo-remove:hover {
+  opacity: 1;
+  color: #f87171;
+}
+
 /* 倒數：每項一個大數字 */
 #extra-widgets .xw-cd-item {
   padding: 0.5rem 0;

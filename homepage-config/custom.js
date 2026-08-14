@@ -146,6 +146,11 @@ function ensureExtras() {
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
       <div class="xw-card"><div class="xw-title">服務延遲</div><div class="xw-body" id="xw-latency">…</div></div>
       <div class="xw-card"><div class="xw-title">便條</div><textarea id="xw-notes-input" class="xw-notes" placeholder="隨手記…"></textarea></div>
+      <div class="xw-card"><div class="xw-title">待辦</div><div class="xw-body" id="xw-todo">…</div>
+        <div class="xw-cd-form">
+          <input id="xw-todo-input" class="xw-cd-in" placeholder="新增待辦…">
+          <button id="xw-todo-add" class="xw-cd-btn" type="button">加</button>
+        </div></div>
       <div class="xw-card"><div class="xw-title">倒數</div><div class="xw-body" id="xw-countdown">…</div>
         <div class="xw-cd-form">
           <input id="xw-cd-label" class="xw-cd-in" placeholder="標題">
@@ -389,6 +394,74 @@ function initNotes() {
   ta.dataset.bound = '1';
 }
 
+// 待辦：存 localStorage，頁面上勾選/新增/刪除
+function loadTodos() {
+  try {
+    const s = localStorage.getItem('xw-todos');
+    if (s) return JSON.parse(s);
+  } catch (e) {}
+  return [];
+}
+function saveTodos(list) {
+  localStorage.setItem('xw-todos', JSON.stringify(list));
+}
+function renderTodos() {
+  const box = document.getElementById('xw-todo');
+  if (!box) return;
+  const list = loadTodos();
+  box.innerHTML = list.length
+    ? list
+        .map(
+          (t, i) =>
+            `<div class="xw-todo-item"><span class="xw-todo-box ${t.done ? 'on' : ''}" data-act="toggle" data-i="${i}"></span><span class="xw-todo-text ${t.done ? 'done' : ''}">${escapeHtml(t.text)}</span><a class="xw-todo-remove" data-i="${i}" title="移除">×</a></div>`
+        )
+        .join('')
+    : '<div class="xw-row" style="opacity:.6">沒有待辦 🎉</div>';
+}
+function addTodoFromInput() {
+  const el = document.getElementById('xw-todo-input');
+  if (!el) return;
+  const text = (el.value || '').trim();
+  if (!text) return;
+  const list = loadTodos();
+  list.push({ text, done: false });
+  saveTodos(list);
+  el.value = '';
+  renderTodos();
+}
+function bindTodoUI() {
+  if (document.__todoBound) return;
+  document.__todoBound = true;
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest) return;
+    if (e.target.closest('#xw-todo-add')) return addTodoFromInput();
+    const box = e.target.closest('.xw-todo-box[data-act="toggle"]');
+    if (box) {
+      const i = parseInt(box.dataset.i, 10);
+      const list = loadTodos();
+      if (list[i]) {
+        list[i].done = !list[i].done;
+        saveTodos(list);
+        renderTodos();
+      }
+      return;
+    }
+    const rm = e.target.closest('.xw-todo-remove');
+    if (rm) {
+      const list = loadTodos();
+      list.splice(parseInt(rm.dataset.i, 10), 1);
+      saveTodos(list);
+      renderTodos();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target && e.target.id === 'xw-todo-input') {
+      e.preventDefault();
+      addTodoFromInput();
+    }
+  });
+}
+
 // 倒數：存 localStorage，頁面上直接新增/刪除（不用改 code / 重部署）
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -498,6 +571,8 @@ async function init() {
   initNotes();
   renderCountdown();
   bindCountdownUI();
+  renderTodos();
+  bindTodoUI();
 
   // 定時更新（順便確保底部卡片還在；被 React 移除就重建並補資料）
   setInterval(() => {
@@ -509,9 +584,11 @@ async function init() {
       renderKuma();
       initNotes();
       renderCountdown();
+      renderTodos();
     } else {
       ensureExtras(); // 只是被搬走的話搬回
       initNotes();
+      renderTodos();
     }
     renderClocks(homeWeather);
     if (currentCity) appendCityToGreeting(currentCity);
