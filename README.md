@@ -1,25 +1,20 @@
 # service-home
 
-VPS 服務導航頁 **home.garyhsieh-proj.com**，用 [Homepage](https://gethomepage.dev/)
-建置。定位是「淺層服務入口大廳」：只做連結 + 狀態燈號，深度操作（效能監控、
-Docker 容器操作、檔案管理）仍走 [VPS Dashboard](https://dashboard.garyhsieh-proj.com)。
+VPS 主控台 **home.garyhsieh-proj.com**，用 [Glance](https://github.com/glanceapp/glance)
+建置：服務啟動器 + 健康監控 + 資訊面板（新聞/行情/世界時鐘/待辦）合一頁。定位是
+「淺層入口」：連結 + 狀態燈號，深度操作（效能監控、Docker 容器操作、檔案管理）
+仍走 [VPS Dashboard](https://dashboard.garyhsieh-proj.com)。
+
+> 原本用 [Homepage](https://gethomepage.dev/) + 手刻的 custom.js 資訊面板，
+> 2026-08 評估後改用 Glance 整合成一頁（不想再多開一個分頁/網域）。
 
 ## 結構
 
 ```
-docker-compose.yml          # Homepage 容器（綁 127.0.0.1:3050，對外走 Caddy）
-homepage-config/            # 掛載進容器的 /app/config，YAML 皆版控
-  settings.yaml             #   標題、主題、群組排列
-  services.yaml             #   服務卡片（href + siteMonitor + 容器狀態）
-  docker.yaml              #   docker.sock 連線，供卡片顯示容器狀態摘要
-  widgets.yaml             #   頁首資訊小工具（問候 / 搜尋 / 日期 / 天氣 / VPS 資源）
-  bookmarks.yaml           #   快速連結（後台 / 程式碼 / 文件）
-  custom.js                #   頁首補當前城市；底部資訊卡（匯率/世界時鐘/預報/HN）
-  custom.css               #   custom.js 的樣式
-sites/home.caddy            # Caddy 反向代理（home，含 basic_auth + /kuma 同源代理）
-sites/status.caddy          # Caddy 反向代理（Uptime Kuma）
-sites/glance.caddy          # Caddy 反向代理（Glance pilot，共用 home 的登入）
-glance-config/glance.yml    # Glance 設定（見下方「Glance pilot」）
+docker-compose.yml           # glance + uptime-kuma 容器
+glance-config/glance.yml     # Glance 全部設定：主題、服務監控、新聞、行情、書籤、待辦…
+sites/home.caddy             # Caddy 反向代理（home，basic_auth 保護，接到 glance）
+sites/status.caddy           # Caddy 反向代理（Uptime Kuma 後台）
 ```
 
 ## 部署
@@ -27,7 +22,7 @@ glance-config/glance.yml    # Glance 設定（見下方「Glance pilot」）
 1. 啟動容器：
 
    ```bash
-   docker compose up -d
+   docker compose up -d --remove-orphans
    ```
 
 2. 佈署 Caddy 設定（複製到 VPS 的 `/etc/caddy/sites/`），驗證後 reload：
@@ -40,34 +35,27 @@ glance-config/glance.yml    # Glance 設定（見下方「Glance pilot」）
 3. Cloudflare 新增 `home.garyhsieh-proj.com` A 記錄，**灰色雲朵（僅限 DNS）**，
    指向 VPS IP，否則 Caddy 簽 HTTPS 憑證會失敗。
 
-4. 打開 https://home.garyhsieh-proj.com 檢查每張卡片的連結與狀態燈號。
+4. 打開 https://home.garyhsieh-proj.com（basic_auth 登入見下方）檢查各 widget。
 
-## 收錄的服務
+## 收錄的服務（Glance「服務健康」monitor）
 
-| 服務 | 網域 | 後端 |
+| 服務 | 網域 | 備註 |
 |---|---|---|
-| VPS Dashboard | dashboard.garyhsieh-proj.com | localhost:3001 |
-| Quick Portal | portal.garyhsieh-proj.com | localhost:5001 |
-| DevHub | devhub.garyhsieh-proj.com | localhost:5000 |
-| 繪本庫 | library.garyhsieh-proj.com | 127.0.0.1:3100 |
-| 定期通知 | routine.garyhsieh-proj.com | 靜態檔（Caddy basic_auth） |
-| ntfy | notify.garyhsieh-proj.com | 127.0.0.1:18080 |
-| Supabase | supabase.garyhsieh-proj.com | localhost:8000 |
+| VPS Dashboard | dashboard.garyhsieh-proj.com | |
+| Quick Portal | portal.garyhsieh-proj.com | |
+| DevHub | devhub.garyhsieh-proj.com | |
+| 繪本庫 | library.garyhsieh-proj.com | |
+| 定期通知 | routine.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
+| ntfy | notify.garyhsieh-proj.com | |
+| Supabase | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
+| mangan-log | mangan-log.garyhsieh-proj.com | |
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
 全部驗證完畢前不要刪除。
 
-## 容器狀態摘要
-
-卡片透過唯讀掛載的 `docker.sock` 顯示容器上/下線與 CPU/記憶體，只做「一眼看有沒有
-掛掉」。`services.yaml` 裡的 `container:` 名稱為推測值，部署前先在 VPS 核對：
-
-```bash
-docker ps --format '{{.Names}}'
-```
-
-名稱對不上時 Homepage 只會不顯示狀態、不報錯。非容器服務（如 routine 靜態檔）不掛
-`container`。深度操作（重啟、看 log）仍走 VPS Dashboard。
+> 深度容器狀態（CPU/記憶體、重啟、看 log）不在這頁做，走 VPS Dashboard。
+> `routine`/`supabase` 目前只驗證「有回應」，不是真的通過認證檢查；
+> 想要精確一點可以幫 `monitor` 那兩筆加 `basic-auth:` / 標頭，見 glance.yml 內註解。
 
 ## mangan-log 路由（取代 Coolify）
 
@@ -85,57 +73,37 @@ VPS=root@你的VPS npm run deploy
 
 它會 build 出 `dist/` 並 scp 到 VPS `/srv/mangan-log`。細節見該 repo 的 `deploy.sh`。
 
-VPS 端一次性：放好 `sites/mangan-log.caddy` → `caddy validate` → `reload`；
-Cloudflare 加 `mangan-log.garyhsieh-proj.com` A 記錄（灰雲）。確認新網域可用後，
-即可在 Coolify 刪掉舊 app；若 Coolify 已無其他負載，可整套退役。
+## 監控引擎：Uptime Kuma
 
-## 監控：Uptime Kuma
-
-`docker-compose.yml` 內含 `uptime-kuma` 容器（綁 `127.0.0.1:3051`，資料存 named volume）。
-它與 homepage 同一 compose 網路，所以 homepage 的 uptimekuma widget 可用
-`http://uptime-kuma:3001` 直連。
+`uptime-kuma` 容器（綁 `127.0.0.1:3051`，資料存 named volume）是**背景監控引擎**：
+歷史曲線、正常運行率、以及**掛掉自動推播到 ntfy**都是它在做。Glance 首頁的
+「服務健康」monitor widget 是**即時檢查**（做啟動器 + 一眼看有沒有掛），兩者互補、
+各自獨立運作，不是同一件事。
 
 一次性設定：
 
-1. VPS 啟動：`docker compose up -d`（會一起把 uptime-kuma 拉起來）。
+1. VPS 啟動：`docker compose up -d`。
 2. Caddy：`cp sites/status.caddy /etc/caddy/sites/` → validate → reload；
    Cloudflare 加 `status.garyhsieh-proj.com` A 記錄（灰雲）。
-3. 開 `https://status.garyhsieh-proj.com` → 建管理員帳號 → 為每個服務新增 Monitor
-   （用各服務的公開網址即可，例如 `https://dashboard.garyhsieh-proj.com`）。
-4. 建一個 **Status Page**，slug 設為 **`home`**（要與 `services.yaml` 的 widget `slug` 一致），
-   把 monitors 加進去、發布。之後 homepage「監控」分頁的卡片就會顯示 up/down 統計。
+3. 開 `https://status.garyhsieh-proj.com` → 建管理員帳號 → 為每個服務新增 Monitor。
+4. 設定通知（設定 → 通知 → 新增 ntfy），套用到所有監測器 → 服務掛掉會推播到手機。
 
-## Glance pilot（評估中，尚未取代 custom.js）
+## Glance 設定（`glance-config/glance.yml`）
 
-`glance.garyhsieh-proj.com` 是 [Glance](https://github.com/glanceapp/glance) 的**試駕**，
-目的是評估要不要拿它取代 Homepage 底部手刻的資訊面板（新聞/世界時鐘/匯率/監控概覽等）。
-詳見規劃文件裡的比較與決策脈絡（`custom.js vs Glance`）。
+一個 YAML 檔管全部，三欄版面：
 
-**這階段做了什麼**：`glance-config/glance.yml` 重建了 3 類代表性 widget——
-世界時鐘 + 匯率行情（`clock` / `markets`）、服務健康監控 + Hacker News
-（`monitor` / `hacker-news`）、中央社科技 + The Verge 的 RSS（`rss` ×2）。
-主題色刻意對齊 Homepage 的 slate 深色 + sky 強調色，兩邊看起來像同一套。
+- **左欄**：`clock`(SF/新竹世界時鐘)、`markets`(USD/TWD 匯率 + BTC-USD 行情)、
+  `to-do`(待辦，內建儲存)。
+- **中欄**：`monitor`(服務健康，見上表)、`hacker-news`。
+- **右欄**：`bookmarks`(後台管理/程式碼/文件快速連結)、`rss`(中央社科技、The Verge)。
 
-**已知限制 / 待確認**（實測後回頭調整）：
-- `monitor` 的服務清單先只放**沒有 basic_auth** 的 6 個服務；`home`、`routine`、
-  `supabase` 需要額外認證（`basic-auth:` 欄位或標頭），先略過，之後要補再說。
-- `markets` 的 `TWD=X`（USD/TWD 外匯）行不行需要部署後實際看一次。
-- 待辦、便條、倒數 Glance 沒有原生 widget（要嘛用 `html` widget 補、要嘛繼續留在 Homepage）。
+主題色對齊原本 Homepage 的 slate 深色 + sky 強調色（`theme:` 區塊；**`light: false`
+必須明確寫**，不然整組主題會被 Glance 判定不完整而退回內建預設）。
 
-一次性部署：
+**目前沒有的**（Glance 沒有原生對應，想要再手動補）：倒數計時、自由便條/scratchpad——
+可以考慮用 Glance 的 `html` widget 手刻一個簡易版，或維持不做。
 
-1. VPS：`docker compose up -d`（拉起 `glance` 容器）。
-2. Caddy：`cp sites/glance.caddy /etc/caddy/sites/` → validate → reload；
-   Cloudflare 加 `glance.garyhsieh-proj.com` A 記錄（灰雲）。
-3. 開 `https://glance.garyhsieh-proj.com`（沿用 home 的登入帳密）。
-
-**評估清單**（用個幾天再回來決定）：
-- [ ] 三張代表性 widget 資料都正常顯示（monitor 綠、markets 兩檔都有數字、RSS/HN 有內容）
-- [ ] 外觀跟 Homepage 放在一起會不會突兀
-- [ ] 比手刻 custom.js 好維護嗎？想加新聞來源/城市會不會比改 JS 輕鬆
-- [ ] 決定：維持 custom.js／Glance 當資訊入口（獨立分頁連結）／Glance 當主入口
-
-修改 `glance-config/glance.yml` 後，跟 Homepage 一樣通常不需重建容器；
+改完 `glance-config/glance.yml` 通常不需重建容器，改完存檔即生效；
 沒生效再 `docker compose restart glance`。
 
 ## home 頁面登入（basic_auth）
@@ -167,8 +135,3 @@ sudo systemctl reload caddy
 
 > 想省事也可以把 hash 直接寫進 `sites/home.caddy`（取代 `{$HOME_AUTH_HASH}`），
 > 但那樣 hash 會進 git——**公開 repo 請務必用強密碼，或維持環境變數作法**。
-
-## 修改設定
-
-改完 `homepage-config/*.yaml` 後，Homepage 會自動重讀，多數情況不需重啟容器；
-若沒生效再 `docker compose restart homepage`。

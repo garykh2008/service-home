@@ -1,19 +1,4 @@
 services:
-  homepage:
-    image: ghcr.io/gethomepage/homepage:latest
-    container_name: homepage
-    ports:
-      # 只綁 localhost，對外一律走 Caddy 反向代理
-      - 127.0.0.1:3050:3000
-    volumes:
-      - ./homepage-config:/app/config
-      # 唯讀掛載 docker.sock，僅用於顯示容器狀態摘要（不做深度操作）
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      # Homepage 從反向代理後面被存取，需允許來源網域
-      HOMEPAGE_ALLOWED_HOSTS: home.garyhsieh-proj.com
-    restart: unless-stopped
-
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
@@ -23,13 +8,12 @@ services:
     volumes:
       - uptime-kuma-data:/app/data
     restart: unless-stopped
-    # 與 homepage 同一個 compose 網路，homepage widget 可用 http://uptime-kuma:3001 連它
 
   glance:
     image: glanceapp/glance:latest
     container_name: glance
     ports:
-      # 只綁 localhost，對外走 Caddy（glance.garyhsieh-proj.com）
+      # 只綁 localhost，對外走 Caddy（home.garyhsieh-proj.com，見 sites/home.caddy）
       - 127.0.0.1:3052:8080
     volumes:
       - ./glance-config:/app/config

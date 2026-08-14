@@ -3,9 +3,9 @@ server:
   proxied: true # 在 Caddy 反向代理後面
 
 theme:
-  # 跟 Homepage 的 slate 深色 + sky 強調色一致，兩個 dashboard 看起來像同一套
+  # 跟原本 Homepage 用的 slate 深色 + sky 強調色一致
   light: false
-  disable-picker: true # 別讓內建主題選色器蓋掉自訂色（也排除瀏覽器記住舊選擇的可能）
+  disable-picker: true
   background-color: 222 47 11
   primary-color: 199 89 48
   positive-color: 142 71 45
@@ -26,13 +26,14 @@ pages:
                 label: 新竹
 
           - type: markets
-            # TWD=X（USD/TWD 外匯）待部署後驗證 Glance 的行情來源支不支援；
-            # BTC-USD 當保底範例，確保這張卡至少有資料可看。
             markets:
               - symbol: TWD=X
                 name: USD/TWD
               - symbol: BTC-USD
                 name: Bitcoin
+
+          - type: to-do
+            id: main
 
       - size: full
         widgets:
@@ -40,8 +41,6 @@ pages:
             title: 服務健康
             cache: 1m
             sites:
-              # 先放沒有 basic_auth 的服務；home/routine/supabase 需要額外帶認證，
-              # 見 README「Glance pilot」一節，之後要加再補。
               - title: VPS Dashboard
                 url: https://dashboard.garyhsieh-proj.com
                 icon: mdi:view-dashboard
@@ -54,9 +53,22 @@ pages:
               - title: 繪本庫
                 url: https://library.garyhsieh-proj.com
                 icon: mdi:book-open-page-variant
+              - title: 定期通知
+                url: https://routine.garyhsieh-proj.com
+                icon: mdi:bell-ring
+                # 該站自己有 basic_auth，沒帶帳密會回 401；先用 alt-status-codes
+                # 把 401 視為「有回應、算正常」。想要精確驗證可改成 basic-auth 帶真帳密。
+                alt-status-codes:
+                  - 401
               - title: ntfy
                 url: https://notify.garyhsieh-proj.com
-                icon: mdi:bell-ring
+                icon: mdi:message-badge
+              - title: Supabase
+                url: https://supabase.garyhsieh-proj.com
+                icon: si:supabase
+                # kong 要求 apikey，沒帶會回 401；同上用 alt-status-codes 視為正常。
+                alt-status-codes:
+                  - 401
               - title: mangan-log
                 url: https://mangan-log.garyhsieh-proj.com
                 icon: mdi:heart-pulse
@@ -68,6 +80,27 @@ pages:
 
       - size: small
         widgets:
+          - type: bookmarks
+            groups:
+              - title: 後台管理
+                links:
+                  - title: Cloudflare
+                    url: https://dash.cloudflare.com
+                    icon: si:cloudflare
+                  - title: DuckDNS
+                    url: https://www.duckdns.org
+              - title: 程式碼
+                links:
+                  - title: service-home
+                    url: https://github.com/garykh2008/service-home
+                    icon: si:github
+              - title: 文件
+                links:
+                  - title: Glance Docs
+                    url: https://github.com/glanceapp/glance
+                  - title: Caddy Docs
+                    url: https://caddyserver.com/docs/
+
           - type: rss
             title: 中央社科技
             limit: 6

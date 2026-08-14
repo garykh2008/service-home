@@ -5,13 +5,6 @@ home.garyhsieh-proj.com {
 		gary {$HOME_AUTH_HASH}
 	}
 
-	# Uptime Kuma 狀態頁 API 同源代理，給 custom.js 讀（避免跨網域 CORS）。
-	# /kuma/api/status-page/... → uptime-kuma /api/status-page/...
-	handle_path /kuma/* {
-		reverse_proxy 127.0.0.1:3051
-	}
-
-	handle {
-		reverse_proxy 127.0.0.1:3050
-	}
+	# 主控台改用 Glance（取代原本的 Homepage/gethomepage）。
+	reverse_proxy 127.0.0.1:3052
 }
