@@ -68,6 +68,43 @@ ul.services-list > li.service > div {
   padding: 0.5rem;
   font: inherit;
 }
+
+/* 倒數：新增表單 */
+#extra-widgets .xw-cd-form {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+#extra-widgets .xw-cd-in {
+  min-width: 0;
+  flex: 1 1 auto;
+  background: rgba(2, 6, 23, 0.4);
+  color: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.45rem;
+  font: inherit;
+  font-size: 0.85rem;
+}
+#extra-widgets .xw-cd-btn {
+  flex: 0 0 auto;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  font: inherit;
+  cursor: pointer;
+}
+#extra-widgets .xw-cd-remove {
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 0 0.2rem;
+}
+#extra-widgets .xw-cd-remove:hover {
+  opacity: 1;
+  color: #f87171;
+}
 #extra-widgets .xw-title {
   font-size: 0.72rem;
   text-transform: uppercase;

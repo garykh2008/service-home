@@ -26,9 +26,9 @@ const NEWS = [
 const KUMA_BASE = '/kuma';
 const KUMA_SLUG = 'home';
 
-// 倒數（可多筆）；date 用當地時間 ISO 字串
+// 倒數：這只是「首次的種子」；實際新增/刪除在頁面倒數卡上操作，存 localStorage。
 const COUNTDOWNS = [
-  { label: '（範例，改成你的）', date: '2026-12-24T18:00:00' },
+  { label: '（範例，可在卡片上刪掉）', date: '2026-12-24' },
 ];
 // ─────────────────────────────────────────────────────
 
@@ -146,7 +146,12 @@ function ensureExtras() {
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
       <div class="xw-card"><div class="xw-title">服務延遲</div><div class="xw-body" id="xw-latency">…</div></div>
       <div class="xw-card"><div class="xw-title">便條</div><textarea id="xw-notes-input" class="xw-notes" placeholder="隨手記…"></textarea></div>
-      <div class="xw-card"><div class="xw-title">倒數</div><div class="xw-body" id="xw-countdown">…</div></div>
+      <div class="xw-card"><div class="xw-title">倒數</div><div class="xw-body" id="xw-countdown">…</div>
+        <div class="xw-cd-form">
+          <input id="xw-cd-label" class="xw-cd-in" placeholder="標題">
+          <input id="xw-cd-date" class="xw-cd-in" type="date">
+          <button id="xw-cd-add" class="xw-cd-btn" type="button">加</button>
+        </div></div>
       ${newsCards}`;
   }
   if (footer && footer.parentNode) {
@@ -286,27 +291,74 @@ function initNotes() {
   ta.dataset.bound = '1';
 }
 
-// 倒數
+// 倒數：存 localStorage，頁面上直接新增/刪除（不用改 code / 重部署）
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function loadCountdowns() {
+  try {
+    const s = localStorage.getItem('xw-countdowns');
+    if (s) return JSON.parse(s);
+  } catch (e) {}
+  return COUNTDOWNS.slice(); // 首次用設定檔的預設當種子
+}
+function saveCountdowns(list) {
+  localStorage.setItem('xw-countdowns', JSON.stringify(list));
+}
 function renderCountdown() {
   const box = document.getElementById('xw-countdown');
   if (!box) return;
+  const list = loadCountdowns();
   const now = Date.now();
-  box.innerHTML = COUNTDOWNS.map((c) => {
-    const t = new Date(c.date).getTime();
-    let txt;
-    if (isNaN(t)) txt = '?';
-    else {
-      const diff = t - now;
-      if (diff <= 0) txt = '已到';
-      else {
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        txt = d > 0 ? `${d} 天 ${h} 時` : `${h} 時 ${m} 分`;
-      }
+  box.innerHTML = list.length
+    ? list
+        .map((c, i) => {
+          const t = new Date(c.date).getTime();
+          let txt;
+          if (isNaN(t)) txt = '?';
+          else {
+            const diff = t - now;
+            if (diff <= 0) txt = '已到';
+            else {
+              const d = Math.floor(diff / 86400000);
+              const h = Math.floor((diff % 86400000) / 3600000);
+              txt = d > 0 ? `${d} 天` : `${h} 時`;
+            }
+          }
+          return `<div class="xw-row"><span>${escapeHtml(c.label)}</span><span>${txt} <a class="xw-cd-remove" data-i="${i}" title="移除">×</a></span></div>`;
+        })
+        .join('')
+    : '<div class="xw-row" style="opacity:.6">尚無項目</div>';
+}
+// 新增/刪除的事件用委派綁在 document（卡片重建也不會失效），只綁一次
+function bindCountdownUI() {
+  if (document.__cdBound) return;
+  document.__cdBound = true;
+  document.addEventListener('click', (e) => {
+    const add = e.target.closest && e.target.closest('#xw-cd-add');
+    if (add) {
+      const labelEl = document.getElementById('xw-cd-label');
+      const dateEl = document.getElementById('xw-cd-date');
+      const label = (labelEl.value || '').trim();
+      const date = dateEl.value;
+      if (!label || !date) return;
+      const list = loadCountdowns();
+      list.push({ label, date });
+      saveCountdowns(list);
+      labelEl.value = '';
+      dateEl.value = '';
+      renderCountdown();
+      return;
     }
-    return `<div class="xw-row"><span>${c.label}</span><span>${txt}</span></div>`;
-  }).join('');
+    const rm = e.target.closest && e.target.closest('.xw-cd-remove');
+    if (rm) {
+      const i = parseInt(rm.dataset.i, 10);
+      const list = loadCountdowns();
+      list.splice(i, 1);
+      saveCountdowns(list);
+      renderCountdown();
+    }
+  });
 }
 
 async function init() {
@@ -343,6 +395,7 @@ async function init() {
   renderKuma();
   initNotes();
   renderCountdown();
+  bindCountdownUI();
 
   // 定時更新（順便確保底部卡片還在；被 React 移除就重建並補資料）
   setInterval(() => {
