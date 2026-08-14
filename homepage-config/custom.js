@@ -66,7 +66,7 @@ async function currentWeather(lat, lon) {
   const d = await fetchJSON(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`
   );
-  return { temp: Math.round(d.current.temperature_2m), emoji: wmoEmoji(d.current.weather_code) };
+  return { temp: Math.round(d.current.temperature_2m), code: d.current.weather_code };
 }
 
 // IP 定位（免權限視窗，較粗略）；主 ipwho.is，退回 geojs
@@ -168,12 +168,17 @@ function renderClocks(homeWeather) {
   const box = document.getElementById('xw-clocks');
   if (!box) return;
   box.innerHTML = CITIES.map((c) => {
-    const w = c.home && homeWeather ? `　${homeWeather.emoji} ${homeWeather.temp}°` : '';
     const hour = parseInt(
       new Intl.DateTimeFormat('en-GB', { timeZone: c.tz, hour: '2-digit', hourCycle: 'h23' }).format(new Date()),
       10
     );
     const dn = hour >= 6 && hour < 18 ? '☀️' : '🌙';
+    let w = '';
+    if (c.home && homeWeather) {
+      // 晴/晴時多雲用左邊的日/夜符號就夠了；只有陰雨等狀況才另外顯示天氣圖示
+      const wx = homeWeather.code >= 3 ? wmoEmoji(homeWeather.code) + ' ' : '';
+      w = `　${wx}${homeWeather.temp}°`;
+    }
     return `<div class="xw-row"><span>${dn} ${c.label}${c.home ? ' 🏠' : ''}</span><span>${timeInTz(c.tz)}${w}</span></div>`;
   }).join('');
 }
@@ -267,6 +272,24 @@ async function renderForecast(coords) {
   }
 }
 
+function parseTime(s) {
+  if (!s) return null;
+  let t = Date.parse(String(s).replace(' ', 'T') + 'Z'); // rss2json 的 "YYYY-MM-DD HH:MM:SS"（UTC）
+  if (isNaN(t)) t = Date.parse(s);
+  return isNaN(t) ? null : t;
+}
+function relTime(ms) {
+  if (!ms || isNaN(ms)) return '';
+  const diff = Date.now() - ms;
+  if (diff < 0) return '';
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return '剛剛';
+  if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h';
+  return Math.floor(h / 24) + 'd';
+}
+
 async function renderNewsSource(i) {
   const box = document.getElementById(`xw-news-${i}`);
   if (!box) return;
@@ -278,16 +301,21 @@ async function renderNewsSource(i) {
       const raw = await Promise.all(
         ids.slice(0, src.count).map((id) => fetchJSON(`https://hacker-news.firebaseio.com/v0/item/${id}.json`))
       );
-      items = raw.map((it) => ({ title: it.title, url: it.url || `https://news.ycombinator.com/item?id=${it.id}` }));
+      items = raw.map((it) => ({
+        title: it.title,
+        url: it.url || `https://news.ycombinator.com/item?id=${it.id}`,
+        time: it.time ? it.time * 1000 : null,
+      }));
     } else {
       // 任意 RSS 經 rss2json 代理轉 JSON
       const j = await fetchJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(src.url));
-      items = (j.items || []).slice(0, src.count).map((it) => ({ title: it.title, url: it.link }));
+      items = (j.items || []).slice(0, src.count).map((it) => ({ title: it.title, url: it.link, time: parseTime(it.pubDate) }));
     }
     box.innerHTML = items
       .map((it) => {
         const title = (it.title || '').replace(/"/g, '&quot;');
-        return `<a href="${it.url}" target="_blank" rel="noopener" title="${title}">• ${it.title}</a>`;
+        const rt = relTime(it.time);
+        return `<a class="xw-news-row" href="${it.url}" target="_blank" rel="noopener" title="${title}"><span class="xw-news-title">• ${it.title}</span>${rt ? `<span class="xw-news-time">${rt}</span>` : ''}</a>`;
       })
       .join('');
   } catch (e) {
@@ -327,10 +355,12 @@ async function renderKuma() {
     if (summary) {
       const ok = down === 0;
       const avg = lat.length ? Math.round(lat.reduce((a, b) => a + b.ping, 0) / lat.length) : null;
+      const nowStr = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
       summary.className = 'xw-status ' + (ok ? 'ok' : 'bad');
-      summary.textContent = ok
-        ? `🟢 全部服務正常　·　${up}/${total}${avg != null ? `　·　平均 ${avg}ms` : ''}`
-        : `🔴 ${down} 項異常：${downNames.join('、')}　·　${up}/${total} 正常`;
+      summary.textContent =
+        (ok
+          ? `🟢 全部服務正常　·　${up}/${total}${avg != null ? `　·　平均 ${avg}ms` : ''}`
+          : `🔴 ${down} 項異常：${downNames.join('、')}　·　${up}/${total} 正常`) + `　·　更新 ${nowStr}`;
     }
     if (latBox) {
       lat.sort((a, b) => b.ping - a.ping);
@@ -393,7 +423,7 @@ function renderCountdown() {
               txt = d > 0 ? `${d} 天` : `${h} 時`;
             }
           }
-          return `<div class="xw-row"><span>${escapeHtml(c.label)}</span><span>${txt} <a class="xw-cd-remove" data-i="${i}" title="移除">×</a></span></div>`;
+          return `<div class="xw-row" title="${escapeHtml(c.date)}"><span>${escapeHtml(c.label)}</span><span>${txt} <a class="xw-cd-remove" data-i="${i}" title="移除">×</a></span></div>`;
         })
         .join('')
     : '<div class="xw-row" style="opacity:.6">尚無項目</div>';

@@ -192,3 +192,21 @@ ul.services-list > li.service > div {
   padding: 0.15rem 0;
   line-height: 1.4;
 }
+#extra-widgets .xw-news a.xw-news-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  overflow: visible;
+  white-space: normal;
+}
+#extra-widgets .xw-news-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#extra-widgets .xw-news-time {
+  flex: 0 0 auto;
+  opacity: 0.45;
+  font-size: 0.72rem;
+}
