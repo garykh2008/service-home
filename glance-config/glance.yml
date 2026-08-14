@@ -29,8 +29,10 @@ pages:
             markets:
               - symbol: TWD=X
                 name: USD/TWD
-              - symbol: BTC-USD
-                name: Bitcoin
+              - symbol: TWDJPY=X
+                # Yahoo 的 cross-pair 慣例（AAABBB=X = 1 AAA 換多少 BBB）；
+                # 部署後確認數字合理（1 TWD 換 4~5 日圓左右）。
+                name: TWD/JPY
 
           - type: to-do
             id: main
@@ -104,6 +106,7 @@ pages:
           - type: rss
             title: 中央社科技
             limit: 6
+            single-line-titles: true # 標題截斷成一行＋省略號，跟 Homepage 舊版一樣，避免長標題亂折行
             feeds:
               - url: https://feeds.feedburner.com/rsscna/technology
                 title: 中央社科技
@@ -111,6 +114,7 @@ pages:
           - type: rss
             title: The Verge
             limit: 6
+            single-line-titles: true
             feeds:
               - url: https://www.theverge.com/rss/index.xml
                 title: The Verge
