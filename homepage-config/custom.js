@@ -141,22 +141,28 @@ function ensureExtras() {
     ).join('');
     root.innerHTML = `
       <div class="xw-status" id="xw-status">監控概覽讀取中…</div>
+
+      <div class="xw-section">即時</div>
       <div class="xw-card"><div class="xw-title">匯率</div><div class="xw-body" id="xw-exchange">…</div></div>
       <div class="xw-card"><div class="xw-title">世界時鐘</div><div class="xw-body" id="xw-clocks"></div></div>
       <div class="xw-card"><div class="xw-title">${FORECAST_DAYS} 日預報</div><div class="xw-body" id="xw-forecast">…</div></div>
       <div class="xw-card"><div class="xw-title">服務延遲</div><div class="xw-body" id="xw-latency">…</div></div>
+
+      <div class="xw-section">個人</div>
       <div class="xw-card"><div class="xw-title">便條</div><textarea id="xw-notes-input" class="xw-notes" placeholder="隨手記…"></textarea></div>
       <div class="xw-card"><div class="xw-title">待辦</div><div class="xw-body" id="xw-todo">…</div>
         <div class="xw-cd-form">
           <input id="xw-todo-input" class="xw-cd-in" placeholder="新增待辦…">
-          <button id="xw-todo-add" class="xw-cd-btn" type="button">加</button>
+          <button id="xw-todo-add" class="xw-cd-btn" type="button" title="新增">+</button>
         </div></div>
       <div class="xw-card"><div class="xw-title">倒數</div><div class="xw-body" id="xw-countdown">…</div>
         <div class="xw-cd-form">
           <input id="xw-cd-label" class="xw-cd-in" placeholder="標題">
           <input id="xw-cd-date" class="xw-cd-in" type="date">
-          <button id="xw-cd-add" class="xw-cd-btn" type="button">加</button>
+          <button id="xw-cd-add" class="xw-cd-btn" type="button" title="新增">+</button>
         </div></div>
+
+      <div class="xw-section">新聞</div>
       ${newsCards}`;
   }
   if (footer && footer.parentNode) {

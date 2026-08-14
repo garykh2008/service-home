@@ -38,6 +38,18 @@ ul.services-list > li.service > div {
   font-size: 0.78rem;
 }
 
+/* 分區小標題（跨整排） */
+#extra-widgets .xw-section {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  opacity: 0.45;
+  margin: 0.3rem 0 0.1rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
 /* 匯率走勢 sparkline */
 #extra-widgets .xw-spark {
   width: 100%;
@@ -240,9 +252,15 @@ ul.services-list > li.service > div {
   color: #4ade80;
   border: 1px solid rgba(74, 222, 128, 0.35);
   border-radius: 0.4rem;
-  padding: 0.3rem 0.7rem;
+  padding: 0.25rem 0.6rem;
   font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
+}
+#extra-widgets .xw-cd-btn:hover {
+  background: rgba(74, 222, 128, 0.25);
 }
 #extra-widgets .xw-cd-remove {
   cursor: pointer;
