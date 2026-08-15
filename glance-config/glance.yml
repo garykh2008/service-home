@@ -99,11 +99,6 @@ pages:
 
           - type: bookmarks
             groups:
-              - title: 生活
-                links:
-                  - title: YouTube
-                    url: https://www.youtube.com/feed/subscriptions
-                    icon: si:youtube
               - title: 後台管理
                 links:
                   - title: Cloudflare
@@ -134,6 +129,16 @@ pages:
             limit: 10
             sort-by: top
             collapse-after: 8
+
+          - type: videos
+            title: 追蹤頻道
+            channels:
+              - UCvUJ6BwgUGWBHuUd0cv546g # 小宁子 XNZ
+              - UCfq75-6J5seC82CmtLSFxXw # The DoDo Men - 嘟嘟人
+              - UC2Zn5hlv7_hPsLlh_xwcH6g # 邦尼幫你 3C 科技
+              - UCZp_f6DC_gDgJD8etJuIFJA # 好味小姐腦波弱
+            limit: 12
+            collapse-after: 6
 
       - size: small
         widgets:
