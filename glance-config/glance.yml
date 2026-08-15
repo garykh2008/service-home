@@ -99,6 +99,11 @@ pages:
 
           - type: bookmarks
             groups:
+              - title: 生活
+                links:
+                  - title: YouTube
+                    url: https://www.youtube.com/feed/subscriptions
+                    icon: si:youtube
               - title: 後台管理
                 links:
                   - title: Cloudflare
