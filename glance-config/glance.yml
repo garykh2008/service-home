@@ -58,34 +58,12 @@ pages:
             title: 服務健康
             cache: 1m
             sites:
-              - title: VPS Dashboard
-                url: https://dashboard.garyhsieh-proj.com
-                icon: mdi:view-dashboard
               - title: Quick Portal
                 url: https://portal.garyhsieh-proj.com
                 icon: mdi:send
-              - title: DevHub
-                url: https://devhub.garyhsieh-proj.com
-                icon: mdi:code-braces
               - title: 繪本庫
                 url: https://library.garyhsieh-proj.com
                 icon: mdi:book-open-page-variant
-              - title: 定期通知
-                url: https://routine.garyhsieh-proj.com
-                icon: mdi:bell-ring
-                # 該站自己有 basic_auth，沒帶帳密會回 401；先用 alt-status-codes
-                # 把 401 視為「有回應、算正常」。想要精確驗證可改成 basic-auth 帶真帳密。
-                alt-status-codes:
-                  - 401
-              - title: ntfy
-                url: https://notify.garyhsieh-proj.com
-                icon: di:ntfy
-              - title: Supabase
-                url: https://supabase.garyhsieh-proj.com
-                icon: si:supabase
-                # kong 要求 apikey，沒帶會回 401；同上用 alt-status-codes 視為正常。
-                alt-status-codes:
-                  - 401
               - title: mangan-log
                 url: https://mangan-log.garyhsieh-proj.com
                 icon: mdi:heart-pulse
@@ -95,19 +73,6 @@ pages:
               - title: ShareSettle
                 url: https://sharesettle.vercel.app
                 icon: mdi:cash-multiple
-              - title: Report 檢視
-                url: https://report.garyhsieh-proj.com
-                icon: mdi:file-chart-outline
-                # 該站自己有 basic_auth，沒帶帳密會回 401；同 routine/supabase
-                # 用 alt-status-codes 視為正常。
-                alt-status-codes:
-                  - 401
-              - title: API 文件生成器
-                url: https://docs.garyhsieh-proj.com
-                icon: mdi:file-document-outline
-                # 同 Report 檢視，basic_auth 保護，401 視為正常。
-                alt-status-codes:
-                  - 401
 
           - type: server-stats
             # 容器共用 host 的核心，CPU/記憶體應該準；磁碟用量可能只反映容器自己的
@@ -138,6 +103,51 @@ pages:
                   - title: Caddy Docs
                     url: https://caddyserver.com/docs/
                     icon: si:caddy
+
+  - name: 工作
+    slug: work
+    columns:
+      - size: full
+        widgets:
+          - type: monitor
+            title: 服務健康
+            cache: 1m
+            sites:
+              - title: VPS Dashboard
+                url: https://dashboard.garyhsieh-proj.com
+                icon: mdi:view-dashboard
+              - title: DevHub
+                url: https://devhub.garyhsieh-proj.com
+                icon: mdi:code-braces
+              - title: 定期通知
+                url: https://routine.garyhsieh-proj.com
+                icon: mdi:bell-ring
+                # 該站自己有 basic_auth，沒帶帳密會回 401；先用 alt-status-codes
+                # 把 401 視為「有回應、算正常」。想要精確驗證可改成 basic-auth 帶真帳密。
+                alt-status-codes:
+                  - 401
+              - title: ntfy
+                url: https://notify.garyhsieh-proj.com
+                icon: di:ntfy
+              - title: Supabase
+                url: https://supabase.garyhsieh-proj.com
+                icon: si:supabase
+                # kong 要求 apikey，沒帶會回 401；同上用 alt-status-codes 視為正常。
+                alt-status-codes:
+                  - 401
+              - title: Report 檢視
+                url: https://report.garyhsieh-proj.com
+                icon: mdi:file-chart-outline
+                # 該站自己有 basic_auth，沒帶帳密會回 401；同 routine/supabase
+                # 用 alt-status-codes 視為正常。
+                alt-status-codes:
+                  - 401
+              - title: API 文件生成器
+                url: https://docs.garyhsieh-proj.com
+                icon: mdi:file-document-outline
+                # 同 Report 檢視，basic_auth 保護，401 視為正常。
+                alt-status-codes:
+                  - 401
 
   - name: News
     slug: news

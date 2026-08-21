@@ -41,20 +41,23 @@ sites/docs.caddy             # Caddy 反向代理（API 文件生成器，basic_
 
 ## 收錄的服務（Glance「服務健康」monitor）
 
-| 服務 | 網域 | 備註 |
-|---|---|---|
-| VPS Dashboard | dashboard.garyhsieh-proj.com | |
-| Quick Portal | portal.garyhsieh-proj.com | |
-| DevHub | devhub.garyhsieh-proj.com | |
-| 繪本庫 | library.garyhsieh-proj.com | |
-| 定期通知 | routine.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
-| ntfy | notify.garyhsieh-proj.com | |
-| Supabase | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
-| mangan-log | mangan-log.garyhsieh-proj.com | |
-| DayLink Calendar | daylink-calendar.vercel.app | Vercel 託管，不在 VPS 上 |
-| ShareSettle | sharesettle.vercel.app | Vercel 託管，不在 VPS 上 |
-| Report 檢視 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
-| API 文件生成器 | docs.garyhsieh-proj.com | 服務本身在 `/root/APIDocGenerator`（獨立 repo），基本邏輯同 Report 檢視 |
+服務變多後（2026-08）拆成兩份獨立清單：Home 頁留生活/個人用的，開發/維運類的
+移到獨立的「工作」分頁。
+
+| 服務 | 分頁 | 網域 | 備註 |
+|---|---|---|---|
+| Quick Portal | Home | portal.garyhsieh-proj.com | |
+| 繪本庫 | Home | library.garyhsieh-proj.com | |
+| mangan-log | Home | mangan-log.garyhsieh-proj.com | |
+| DayLink Calendar | Home | daylink-calendar.vercel.app | Vercel 託管，不在 VPS 上 |
+| ShareSettle | Home | sharesettle.vercel.app | Vercel 託管，不在 VPS 上 |
+| VPS Dashboard | 工作 | dashboard.garyhsieh-proj.com | |
+| DevHub | 工作 | devhub.garyhsieh-proj.com | |
+| 定期通知 | 工作 | routine.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
+| ntfy | 工作 | notify.garyhsieh-proj.com | |
+| Supabase | 工作 | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
+| Report 檢視 | 工作 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
+| API 文件生成器 | 工作 | docs.garyhsieh-proj.com | 服務本身在 `/root/APIDocGenerator`（獨立 repo），基本邏輯同 Report 檢視 |
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
 全部驗證完畢前不要刪除。
@@ -96,16 +99,24 @@ VPS=root@你的VPS npm run deploy
 
 ## Glance 設定（`glance-config/glance.yml`）
 
-一個 YAML 檔管全部，兩個分頁：
+一個 YAML 檔管全部，四個分頁：
 
 **Home**
-- **左欄**：`clock`(SF/新竹世界時鐘)、`weather`(新竹天氣，固定地點)、
-  `markets`(USD/TWD、TWD/JPY 匯率)、`to-do`(待辦，內建儲存)、`bookmarks`(快速連結)。
-- **右欄**：`monitor`(服務健康，見上表)、`server-stats`(VPS CPU/記憶體)。
+- **左欄**：`search`(DDG)、`clock`(SF/新竹世界時鐘)、`weather`(新竹天氣，固定地點)。
+- **中欄**：`markets`(USD/TWD、TWD/JPY 匯率)、`to-do`(待辦，內建儲存)。
+- **右欄**：`monitor`(服務健康，個人/生活用服務)、`server-stats`(VPS CPU/記憶體)、
+  `bookmarks`(快速連結)。
+
+**工作**：`monitor`(服務健康，VPS 基礎設施/開發相關服務)。跟 Home 的服務健康是
+兩份獨立清單——2026-08 服務數量變多後拆開，Home 只留生活/個人用的，開發/
+維運相關的移來這頁，見上方服務表格哪個歸哪邊。
 
 **News**
 - **左欄**：`hacker-news`。
 - **中/右欄**：`rss`(中央社科技、The Verge)。
+
+**影片**：`videos` widget（grid-cards 排版），追蹤特定 YouTube 頻道的更新，
+獨立分頁避免擠在 News 頁下面。
 
 主題色對齊原本 Homepage 的 slate 深色 + sky 強調色（`theme:` 區塊；**`light: false`
 必須明確寫**，不然整組主題會被 Glance 判定不完整而退回內建預設）。
