@@ -89,6 +89,13 @@ pages:
               - title: mangan-log
                 url: https://mangan-log.garyhsieh-proj.com
                 icon: mdi:heart-pulse
+              - title: Report 檢視
+                url: https://report.garyhsieh-proj.com
+                icon: mdi:file-chart-outline
+                # 該站自己有 basic_auth，沒帶帳密會回 401；同 routine/supabase
+                # 用 alt-status-codes 視為正常。
+                alt-status-codes:
+                  - 401
 
           - type: server-stats
             # 容器共用 host 的核心，CPU/記憶體應該準；磁碟用量可能只反映容器自己的

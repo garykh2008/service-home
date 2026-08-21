@@ -15,6 +15,7 @@ docker-compose.yml           # glance + uptime-kuma 容器
 glance-config/glance.yml     # Glance 全部設定：主題、服務監控、新聞、行情、書籤、待辦…
 sites/home.caddy             # Caddy 反向代理（home，basic_auth 保護，接到 glance）
 sites/status.caddy           # Caddy 反向代理（Uptime Kuma 後台）
+sites/report.caddy           # Caddy 反向代理（Report 檢視，basic_auth 保護，接到 :8787）
 ```
 
 ## 部署
@@ -49,6 +50,7 @@ sites/status.caddy           # Caddy 反向代理（Uptime Kuma 後台）
 | ntfy | notify.garyhsieh-proj.com | |
 | Supabase | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
 | mangan-log | mangan-log.garyhsieh-proj.com | |
+| Report 檢視 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
 全部驗證完畢前不要刪除。
@@ -139,3 +141,23 @@ sudo systemctl reload caddy
 
 > 想省事也可以把 hash 直接寫進 `sites/home.caddy`（取代 `{$HOME_AUTH_HASH}`），
 > 但那樣 hash 會進 git——**公開 repo 請務必用強密碼，或維持環境變數作法**。
+
+## report 頁面登入（basic_auth）
+
+`sites/report.caddy` 把 `report.garyhsieh-proj.com` 反代到 VPS 內部服務 `127.0.0.1:8787`
+（該服務本身沒對外開網域，只綁 host 的 loopback），同樣用 `basic_auth` 保護，
+密碼 hash 走獨立的環境變數 `REPORT_AUTH_HASH`（跟 home 的帳密分開，可以設不同密碼）。
+
+一次性設定（`caddy.env` 已存在的話直接補一行，不用整個重來）：
+
+```bash
+caddy hash-password --plaintext '你的密碼'
+echo 'REPORT_AUTH_HASH=貼上剛才的hash' | sudo tee -a /etc/caddy/caddy.env
+
+export REPORT_AUTH_HASH=貼上剛才的hash   # 手動 validate 前先 export
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+```
+
+別忘了 Cloudflare 新增 `report.garyhsieh-proj.com` A 記錄（灰色雲朵，僅限 DNS），
+否則 Caddy 簽 HTTPS 憑證會失敗。

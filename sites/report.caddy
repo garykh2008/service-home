@@ -1,0 +1,9 @@
+report.garyhsieh-proj.com {
+	# 登入保護（basic_auth）。密碼 hash 從環境變數 REPORT_AUTH_HASH 帶入，不進版控。
+	# 設定方式見 README「report 頁面登入」（跟 home 頁面同一套做法，各自獨立帳密）。
+	basic_auth {
+		gary {$REPORT_AUTH_HASH}
+	}
+
+	reverse_proxy 127.0.0.1:8787
+}
