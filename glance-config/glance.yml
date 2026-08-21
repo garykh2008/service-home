@@ -102,6 +102,12 @@ pages:
                 # 用 alt-status-codes 視為正常。
                 alt-status-codes:
                   - 401
+              - title: API 文件生成器
+                url: https://docs.garyhsieh-proj.com
+                icon: mdi:file-document-outline
+                # 同 Report 檢視，basic_auth 保護，401 視為正常。
+                alt-status-codes:
+                  - 401
 
           - type: server-stats
             # 容器共用 host 的核心，CPU/記憶體應該準；磁碟用量可能只反映容器自己的

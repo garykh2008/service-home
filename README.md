@@ -16,6 +16,7 @@ glance-config/glance.yml     # Glance 全部設定：主題、服務監控、新
 sites/home.caddy             # Caddy 反向代理（home，basic_auth 保護，接到 glance）
 sites/status.caddy           # Caddy 反向代理（Uptime Kuma 後台）
 sites/report.caddy           # Caddy 反向代理（Report 檢視，basic_auth 保護，接到 :8787）
+sites/docs.caddy             # Caddy 反向代理（API 文件生成器，basic_auth 保護，接到 :8090）
 ```
 
 ## 部署
@@ -53,6 +54,7 @@ sites/report.caddy           # Caddy 反向代理（Report 檢視，basic_auth �
 | DayLink Calendar | daylink-calendar.vercel.app | Vercel 託管，不在 VPS 上 |
 | ShareSettle | sharesettle.vercel.app | Vercel 託管，不在 VPS 上 |
 | Report 檢視 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
+| API 文件生成器 | docs.garyhsieh-proj.com | 服務本身在 `/root/APIDocGenerator`（獨立 repo），基本邏輯同 Report 檢視 |
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
 全部驗證完畢前不要刪除。
@@ -163,3 +165,21 @@ sudo systemctl reload caddy
 
 別忘了 Cloudflare 新增 `report.garyhsieh-proj.com` A 記錄（灰色雲朵，僅限 DNS），
 否則 Caddy 簽 HTTPS 憑證會失敗。
+
+## docs 頁面登入（basic_auth）
+
+`sites/docs.caddy` 把 `docs.garyhsieh-proj.com` 反代到 API 文件生成器
+（`/root/APIDocGenerator`，獨立 repo，只綁 `127.0.0.1:8090`；該服務本身也有
+`APIDOC_PASSWORD` 機制，但目前留空，完全靠 Caddy 這層 basic_auth 做保護）。
+密碼 hash 走獨立的環境變數 `DOCS_AUTH_HASH`，設定方式同 report：
+
+```bash
+caddy hash-password --plaintext '你的密碼'
+echo 'DOCS_AUTH_HASH=貼上剛才的hash' | sudo tee -a /etc/caddy/caddy.env
+
+export DOCS_AUTH_HASH=貼上剛才的hash   # 手動 validate 前先 export
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+```
+
+同樣別忘了 Cloudflare 新增 `docs.garyhsieh-proj.com` A 記錄（灰色雲朵，僅限 DNS）。
