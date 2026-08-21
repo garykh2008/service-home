@@ -46,16 +46,16 @@ sites/docs.caddy             # Caddy 反向代理（API 文件生成器，basic_
 
 | 服務 | 分頁 | 網域 | 備註 |
 |---|---|---|---|
-| Quick Portal | Home | portal.garyhsieh-proj.com | |
 | 繪本庫 | Home | library.garyhsieh-proj.com | |
 | mangan-log | Home | mangan-log.garyhsieh-proj.com | |
 | DayLink Calendar | Home | daylink-calendar.vercel.app | Vercel 託管，不在 VPS 上 |
 | ShareSettle | Home | sharesettle.vercel.app | Vercel 託管，不在 VPS 上 |
-| VPS Dashboard | 工作 | dashboard.garyhsieh-proj.com | |
+| VPS Dashboard | Home | dashboard.garyhsieh-proj.com | |
+| 定期通知 | Home | routine.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
+| ntfy | Home | notify.garyhsieh-proj.com | |
+| Supabase | Home | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
+| Quick Portal | 工作 | portal.garyhsieh-proj.com | |
 | DevHub | 工作 | devhub.garyhsieh-proj.com | |
-| 定期通知 | 工作 | routine.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
-| ntfy | 工作 | notify.garyhsieh-proj.com | |
-| Supabase | 工作 | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
 | Report 檢視 | 工作 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
 | API 文件生成器 | 工作 | docs.garyhsieh-proj.com | 服務本身在 `/root/APIDocGenerator`（獨立 repo），基本邏輯同 Report 檢視 |
 
@@ -107,9 +107,10 @@ VPS=root@你的VPS npm run deploy
 - **右欄**：`monitor`(服務健康，個人/生活用服務)、`server-stats`(VPS CPU/記憶體)、
   `bookmarks`(快速連結)。
 
-**工作**：`monitor`(服務健康，VPS 基礎設施/開發相關服務)。跟 Home 的服務健康是
-兩份獨立清單——2026-08 服務數量變多後拆開，Home 只留生活/個人用的，開發/
-維運相關的移來這頁，見上方服務表格哪個歸哪邊。
+**工作**：`monitor`(服務健康，Gary 認定的工作用服務：Quick Portal、DevHub、
+Report 檢視、API 文件生成器)。跟 Home 的服務健康是兩份獨立清單——2026-08
+服務數量變多後拆開，哪個服務歸哪頁純粹按 Gary 的分類，不是照技術性質分，
+見上方服務表格哪個歸哪邊。
 
 **News**
 - **左欄**：`hacker-news`。
