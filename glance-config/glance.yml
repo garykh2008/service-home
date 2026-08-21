@@ -89,6 +89,12 @@ pages:
               - title: mangan-log
                 url: https://mangan-log.garyhsieh-proj.com
                 icon: mdi:heart-pulse
+              - title: DayLink Calendar
+                url: https://daylink-calendar.vercel.app
+                icon: mdi:calendar-month
+              - title: ShareSettle
+                url: https://sharesettle.vercel.app
+                icon: mdi:cash-multiple
               - title: Report 檢視
                 url: https://report.garyhsieh-proj.com
                 icon: mdi:file-chart-outline

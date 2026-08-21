@@ -50,6 +50,8 @@ sites/report.caddy           # Caddy 反向代理（Report 檢視，basic_auth �
 | ntfy | notify.garyhsieh-proj.com | |
 | Supabase | supabase.garyhsieh-proj.com | kong 要求 apikey，同樣用 `alt-status-codes: [401]` |
 | mangan-log | mangan-log.garyhsieh-proj.com | |
+| DayLink Calendar | daylink-calendar.vercel.app | Vercel 託管，不在 VPS 上 |
+| ShareSettle | sharesettle.vercel.app | Vercel 託管，不在 VPS 上 |
 | Report 檢視 | report.garyhsieh-proj.com | 自己有 basic_auth，用 `alt-status-codes: [401]` 視為正常 |
 
 舊的 duckdns 網域在過渡期由 `sites/legacy-duckdns.caddy`（在 VPS 上）備援，
