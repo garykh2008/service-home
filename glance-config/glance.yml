@@ -137,16 +137,6 @@ pages:
             sort-by: top
             collapse-after: 8
 
-          - type: videos
-            title: 追蹤頻道
-            channels:
-              - UCvUJ6BwgUGWBHuUd0cv546g # 小宁子 XNZ
-              - UCfq75-6J5seC82CmtLSFxXw # The DoDo Men - 嘟嘟人
-              - UC2Zn5hlv7_hPsLlh_xwcH6g # 邦尼幫你 3C 科技
-              - UCZp_f6DC_gDgJD8etJuIFJA # 好味小姐腦波弱
-            limit: 12
-            collapse-after: 6
-
       - size: small
         widgets:
           - type: rss
@@ -166,3 +156,17 @@ pages:
             feeds:
               - url: https://www.theverge.com/rss/index.xml
                 title: The Verge
+
+  - name: 影片
+    slug: videos
+    columns:
+      - size: full
+        widgets:
+          - type: videos
+            channels:
+              - UCvUJ6BwgUGWBHuUd0cv546g # 小宁子 XNZ
+              - UCfq75-6J5seC82CmtLSFxXw # The DoDo Men - 嘟嘟人
+              - UC2Zn5hlv7_hPsLlh_xwcH6g # 邦尼幫你 3C 科技
+              - UCZp_f6DC_gDgJD8etJuIFJA # 好味小姐腦波弱
+            limit: 24
+            collapse-after: 12
